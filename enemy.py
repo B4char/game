@@ -210,10 +210,13 @@ class Enemy(pygame.sprite.Sprite):
 
     def reverse(self):
         # flip the enemy
-        if randint(1, 1) == 1:
-            self.speed *= -1
-            self.direction *= -1
-            self.flip = not self.flip
+        self.speed *= -1
+        self.direction *= -1
+        self.flip = not self.flip
+        if self.flip:
+            self.pos.x -= 2
+        else:
+            self.pos.x += 2
 
     def kill_enemy(self):
         # a function to kill the enemy
@@ -242,8 +245,8 @@ class Enemy(pygame.sprite.Sprite):
 
     def update(self, shift_x):
         pygame.draw.rect(self.display_surface, 'black', self.vision_rect, 2)  # vision
-        pygame.draw.rect(self.display_surface, 'green', self.attack_hitbox, 2)  # hitbox
-        # pygame.draw.rect(self.display_surface, 'red', self.rect, 2)  # self.rect
+        # pygame.draw.rect(self.display_surface, 'green', self.attack_hitbox, 2)  # hitbox
+        pygame.draw.rect(self.display_surface, 'red', self.rect, 2)  # self.rect
         self.check_alive()
 
         # idling counter:
@@ -255,7 +258,6 @@ class Enemy(pygame.sprite.Sprite):
         # attack idle cooldown:
         if self.idling_after_attack_cooldown > 0:
             self.idling_after_attack_cooldown -= 1
-
         if self.idling_after_attack_cooldown == 0:
             self.idling_after_attack = False
 
@@ -292,7 +294,13 @@ class Enemy(pygame.sprite.Sprite):
                     self.ai_random_movement()
                 # check if the enemy is colliding with a reverse object:
                 if pygame.sprite.spritecollide(self, enemy_constraint_sprites, False):
-                    self.reverse()
+                    for reverse_sprite in enemy_constraint_sprites.sprites():
+                        if self.flip:
+                            if self.rect.left == reverse_sprite.rect.left:
+                                self.reverse()
+                        else:
+                            if self.rect.right == reverse_sprite.rect.right:
+                                self.reverse()
 
             else:  # the enemy can see the player
                 # check if the enemy is idling after his attack:
