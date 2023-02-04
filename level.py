@@ -95,11 +95,11 @@ class Level:
         player_x = player.rect.centerx
         direction_x = player.direction.x
 
-        if (screen_width // 2) > player_x > player_constraint_sprites.sprites()[0].rect.right + 7 * tile_size + 10\
+        if (screen_width // 2) > player_x > player_constraint_sprites.sprites()[0].rect.right + 9 * tile_size + 10\
                 and direction_x < 0:
             self.world_shift_x = permanent_speed
             player.speed = 0
-        elif (screen_width // 2) < player_x < player_constraint_sprites.sprites()[1].rect.left - 7 * tile_size - 10\
+        elif (screen_width // 2) < player_x < player_constraint_sprites.sprites()[1].rect.left - 9 * tile_size - 10\
                 and direction_x > 0:
             self.world_shift_x = -permanent_speed
             player.speed = 0

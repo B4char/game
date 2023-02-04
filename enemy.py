@@ -36,25 +36,20 @@ class Enemy(pygame.sprite.Sprite):
         self.falling_speed = 0  # falling speed
         self.speed = 2  # speed
         self.direction = 1  # which direction is the enemy facing ? (1 - right, -1 - left)
-        self.idling_cooldown = 0  # cooldown for the idling animation
         self.flip = False  # where is the enemy facing ? (False - right, True - left)
-        self.idling = False  # is the enemy idling ? (yes/no)
+        self.idle = False
 
         # attack
-        self.hit = False
-        self.hitting = False  # is the enemy at the middle of the attack animation ? (yes/no)
         self.on_player = False  # can the enemy see the player ? (yes/no)
-        self.idling_after_attack = False  # the enemy is idling ? (yes/no)
-        self.idling_after_attack_cooldown = 0  # cooldown for the idling animation
-        self.attack_cooldown = 0  # attack cooldown for the next attack
+        self.attacking = False
 
         # health / status
         self.is_alive = True  # is the player alive ? (yes/no)
         self.health = 150  # enemy health
 
         # timers
-        self.update_kill_time = pygame.time.get_ticks()  # death animation
-        self.update_time = pygame.time.get_ticks()  # animations
+        self.animation_timer = pygame.time.get_ticks()  # animation timer
+        self.idle_timer = pygame.time.get_ticks()  # idle timer
 
     def animate(self):
         # the function animates the enemy
@@ -81,17 +76,15 @@ class Enemy(pygame.sprite.Sprite):
             if not self.flip:
                 self.rect.x -= 24
         # check if enough time has passed since the last update
-        if pygame.time.get_ticks() - self.update_time > animation_speed:
-            self.update_time = pygame.time.get_ticks()
+        if pygame.time.get_ticks() - self.animation_timer > animation_speed:
+            self.animation_timer = pygame.time.get_ticks()
             self.frame_index += 1
         # if the animation has run out then reset back to the start
         if self.frame_index >= len(self.animation_list[self.action]):
-            if self.action == 3:  # 3 - attacking
-                self.idle_after_attack()
-                self.attack_cooldown = 50
-                self.hit = False
-            elif self.action == 4:  # 4 - death
+            if self.action == 4:
                 self.frame_index = len(self.animation_list[self.action]) - 1
+            elif self.action == 3:
+                self.action = 0
             else:
                 self.frame_index = 0
 
@@ -101,7 +94,7 @@ class Enemy(pygame.sprite.Sprite):
             self.action = new_action
             # update the animation settings
             self.frame_index = 0
-            self.update_time = pygame.time.get_ticks()
+            self.animation_timer = pygame.time.get_ticks()
 
     def collision(self, direction):
         # check collision between sprites, returns a list of all sprites that intersect with another sprite:
@@ -152,62 +145,6 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.y = round(self.pos.y)
         self.collision('vertical')
 
-    def ai_random_movement(self):
-        # a function for a random movement
-        if self.idling_cooldown == 0:
-            self.idling = False
-            self.speed = 2 * self.direction
-            self.update_action(1)  # 1 - walking
-            self.idle()
-            self.random_reverse()
-
-    def idle_after_attack(self):
-        # the function idles the enemy
-        self.idling_after_attack_cooldown = 75
-        self.idling_after_attack = True
-        self.update_action(0)  # 0 - idle
-
-    def ai_after_player_movement(self):
-        # a function for the movement when the enemy is chasing a player
-        if not self.hitting:
-            self.speed = 3 * self.direction
-        player = player_sprite.sprite
-        # face the player:
-        if self.pos.x < player.pos.x:
-            if self.direction == -1:
-                self.reverse()
-        elif self.pos.x > player.pos.x:
-            if self.direction == 1:
-                self.reverse()
-
-        # check if the enemy can attack
-        if self.attack_cooldown == 0:
-            # check if the player is in range to attack:
-            if self.attack_hitbox.colliderect(player.rect):  # the player is in range
-                self.attack()
-            else:
-                self.update_action(1)
-
-    def attack(self):
-        # an attack function which makes the enemy attack the player
-        self.update_action(3)  # 3 - attacking
-        AttackParticles(self.rect.topleft, self.scale, enemy_attack_particles)  # create attack particles
-        self.attack_cooldown = 50  # set attack cooldown to 200
-        self.speed = 0
-
-    def random_reverse(self):
-        # a function that makes the enemy reverse
-        if randint(1, 1200) == 1:
-            self.reverse()
-
-    def idle(self):
-        # a function that makes the enemy idle
-        if randint(1, 400) == 1:
-            self.update_action(0)  # 0 - idle
-            self.idling = True
-            self.speed = 0
-            self.idling_cooldown = randint(150, 400)
-
     def reverse(self):
         # flip the enemy
         self.speed *= -1
@@ -218,59 +155,102 @@ class Enemy(pygame.sprite.Sprite):
         else:
             self.pos.x += 2
 
-    def kill_enemy(self):
-        # a function to kill the enemy
-        if pygame.time.get_ticks() - self.update_kill_time > 120:
-            self.update_action(4)  # 4 - death
-
     def check_alive(self):
         # checks if the enemy is alive
         if self.health <= 0:
             self.is_alive = False
 
-    def check_vision(self):
-        # check if the player is inside the enemy vision rect (the enemy can see the player)
-        if self.vision_rect.colliderect(player_sprite.sprite.rect):
+    # def hit_collision(self):
+        # player = player_sprite.sprite
+        # if self.hitting:
+            # if pygame.Rect.colliderect(self.attack_hitbox, player.rect) and player.is_alive:
+            # if not self.hit:
+            # player.health -= 1
+            # self.hit = True
+
+    def check_reverse_collision(self):
+        reverse_sprites = pygame.sprite.spritecollide(self, enemy_constraint_sprites, False)
+        if reverse_sprites:
+            for sprite in reverse_sprites:
+                if self.flip:
+                    if self.rect.left == sprite.rect.left:
+                        self.reverse()
+                else:
+                    if self.rect.right == sprite.rect.right:
+                        self.reverse()
+
+    def random_movement(self):
+        self.check_reverse_collision()  # check for reverse collision
+        self.random_reverse()
+
+        if pygame.time.get_ticks() - self.idle_timer > 5500:  # if the enemy was idle for the last 5.5 sec
+            self.idle = False
+
+        if not self.idle:  # the player isn't idle
+            self.update_enemy_to_move()
+            self.random_idle()
+
+    def random_reverse(self):
+        if randint(1, 1000) == 1:
+            self.reverse()
+
+    def random_idle(self):
+        if randint(1, 1200) == 1 and not self.idle:  # the enemy isn't idling rn
+            # idle the enemy
+            self.update_enemy_to_idle()
+
+    def chase_movement(self):
+        if pygame.Rect.colliderect(self.attack_hitbox, player_sprite.sprite.hitbox):
+            self.update_enemy_to_attack()
+
+        if not self.attacking:
+            self.update_enemy_to_move()
+        self.face_player()
+
+    def face_player(self):
+        player = player_sprite.sprite
+        if not self.flip:  # the enemy is facing right
+            if self.pos.x > player.pos.x:
+                self.flip = True
+                self.direction = -1
+                self.speed *= -1
+        else:  # the enemy is facing left
+            if self.pos.x < player.pos.x:
+                self.flip = False
+                self.direction = 1
+                self.speed *= -1
+
+    def check_vision_collision(self):
+        if pygame.Rect.colliderect(self.vision_rect, player_sprite.sprite.rect):
             self.on_player = True
+            self.idle = False
         else:
             self.on_player = False
 
-    def hit_collision(self):
-        player = player_sprite.sprite
-        if self.hitting:
-            if pygame.Rect.colliderect(self.attack_hitbox, player.rect) and player.is_alive:
-                if not self.hit:
-                    player.health -= 1
-                    self.hit = True
+    def update_enemy_to_idle(self):
+        self.idle = True
+        self.speed = 0
+        self.update_action(0)
+        self.idle_timer = pygame.time.get_ticks()
 
-    def update(self, shift_x):
-        pygame.draw.rect(self.display_surface, 'black', self.vision_rect, 2)  # vision
-        # pygame.draw.rect(self.display_surface, 'green', self.attack_hitbox, 2)  # hitbox
-        pygame.draw.rect(self.display_surface, 'red', self.rect, 2)  # self.rect
-        self.check_alive()
+    def update_enemy_to_move(self):
+        self.speed = 2 * self.direction
+        self.update_action(1)
 
-        # idling counter:
-        if self.idling_cooldown > 0:
-            self.idling_cooldown -= 1
-        # attack cooldown:
-        if self.attack_cooldown > 0:
-            self.attack_cooldown -= 1
-        # attack idle cooldown:
-        if self.idling_after_attack_cooldown > 0:
-            self.idling_after_attack_cooldown -= 1
-        if self.idling_after_attack_cooldown == 0:
-            self.idling_after_attack = False
+    def update_enemy_to_run(self):
+        self.speed = 3 * self.direction
+        self.update_action(1)
 
-        # attack particles:
-        if self.action == 3:
-            self.hitting = True
-        else:
-            self.hitting = False
+    def update_enemy_to_attack(self):
+        self.speed = 0
+        self.update_action(3)
+        self.attacking = True
 
-        if self.hitting:
-            enemy_attack_particles.update(self.flip, self.pos, self.display_surface)
-            enemy_attack_particles.draw(self.display_surface)
+    def update_enemy_to_death(self):
+        self.speed = 0
+        self.update_action(4)
 
+    def update_rectangles(self):
         # update rectangles:
         self.old_rect = self.rect.copy()  # update old_rectangle
         if self.flip:  # the enemy is facing left
@@ -282,37 +262,29 @@ class Enemy(pygame.sprite.Sprite):
             self.attack_hitbox.update(round(self.pos.x) + 25, round(self.pos.y),
                                       self.attack_hitbox.width, self.attack_hitbox.height)  # attack hitbox rect
 
+    def update(self, shift_x):
+        pygame.draw.rect(self.display_surface, 'black', self.vision_rect, 2)  # vision
+        # pygame.draw.rect(self.display_surface, 'green', self.attack_hitbox, 2)  # hitbox
+        pygame.draw.rect(self.display_surface, 'red', self.rect, 2)  # self.rect
+        pygame.draw.rect(self.display_surface, 'green', self.old_rect, 2)  # self.rect
+
+        self.check_alive()
+        self.update_rectangles()
+
         # enemy movement:
-        self.check_vision()
-        # check if the player is alive:
         if self.is_alive:  # the enemy is alive
-            self.update_kill_time = pygame.time.get_ticks()  # update check kill time
-            # check if the enemy can see the player:
-            if not self.on_player:  # the enemy can't see the player
-                # check if the enemy is in idle action
-                if not self.idling_after_attack:  # the enemy isn't idling
-                    self.ai_random_movement()
-                # check if the enemy is colliding with a reverse object:
-                if pygame.sprite.spritecollide(self, enemy_constraint_sprites, False):
-                    for reverse_sprite in enemy_constraint_sprites.sprites():
-                        if self.flip:
-                            if self.rect.left == reverse_sprite.rect.left:
-                                self.reverse()
-                        else:
-                            if self.rect.right == reverse_sprite.rect.right:
-                                self.reverse()
-
-            else:  # the enemy can see the player
-                # check if the enemy is idling after his attack:
-                if not self.idling_after_attack:  # the enemy isn't idling
-                    self.ai_after_player_movement()
-
+            self.check_vision_collision()
+            if player_sprite.sprite.is_alive:  # the player is alive
+                if self.on_player:  # the enemy is on the player (chasing the player)
+                    self.chase_movement()
+                else:  # the enemy is not on the player (not chasing the player)
+                    self.random_movement()
+            else:  # the player is dead
+                self.update_enemy_to_idle()
         else:  # the enemy is dead
-            self.speed = 0
-            self.kill_enemy()
+            self.update_enemy_to_death()
 
         self.move(shift_x)
-        self.hit_collision()
 
         # animation:
         self.animate()

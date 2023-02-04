@@ -25,11 +25,13 @@ class Player(pygame.sprite.Sprite):
         # animation:
         self.flip = False
         self.update_time = pygame.time.get_ticks()
+        self.attack_timer_damage = pygame.time.get_ticks()
         self.animation_list = create_player_animation_list(self.scale)
         self.action = 0  # 0 - idle, 1 - run, 2 - jump, 3 - fall, 4 - attack
         self.frame_index = 0
         self.image = self.animation_list[self.action][self.frame_index]
         self.rect = self.image.get_rect(topleft=pos)
+        self.hitbox = pygame.rect.Rect(pos[0] + 10, pos[1], 30, self.rect.height)
         self.old_rect = self.rect.copy()
 
         # hitbox
@@ -125,6 +127,7 @@ class Player(pygame.sprite.Sprite):
         return new_action
 
     def attack(self):
+        self.attack_timer_damage = pygame.time.get_ticks()
         AttackParticles(self.rect.topleft, self.scale, player_attack_particles)
         self.action = 4
         self.attacking = True
@@ -194,8 +197,9 @@ class Player(pygame.sprite.Sprite):
             for enemy in enemy_sprites.sprites():
                 if pygame.Rect.colliderect(self.attack_hitbox, enemy.rect) and enemy.is_alive:
                     if not self.hit:
-                        enemy.health -= 200
-                        self.hit = True
+                        if pygame.time.get_ticks() - self.attack_timer_damage > 400:
+                            enemy.health -= 200
+                            self.hit = True
 
     def move(self):
         # update and check collision in the x direction:
@@ -238,33 +242,29 @@ class Player(pygame.sprite.Sprite):
     def check_alive(self):
         if self.health <= 0:
             self.is_alive = False
-        else:
-            self.update_kill_time = pygame.time.get_ticks()
 
-    def kill_player(self):
-        # a function to kill the player
-        if pygame.time.get_ticks() - self.update_kill_time > 500:
-            self.speed = 0
+    def update_rectangles(self):
+        # update rectangles:
+        self.old_rect = self.rect.copy()
+        if self.flip:
+            self.hitbox.update(self.pos.x + 6, self.pos.y, self.hitbox.width, self.hitbox.height)
+        else:
+            self.hitbox.update(self.pos.x + 8, self.pos.y, self.hitbox.width, self.hitbox.height)
 
     def update(self, jump_event, attack_event):
+        pygame.draw.rect(self.surface_display, 'red', self.hitbox, 2)
         self.jump_event = jump_event
         self.check_alive()
 
-        # check if the player is alive:
-        if self.is_alive:  # the player is alive
-            # update player position:
-            self.inside_level()
-            # update rectangles:
-            self.old_rect = self.rect.copy()
-            # attack:
-            if attack_event and self.attack_cooldown == 0 and self.jump_speed == 0:
-                self.attack()
-            if self.attack_cooldown > 0:
-                self.attack_cooldown -= 1
-            self.hit_collision()
-
-        else:  # the player is dead
-            self.kill_player()
+        # update player position:
+        self.inside_level()
+        self.update_rectangles()
+        # attack:
+        if attack_event and self.attack_cooldown == 0 and self.jump_speed == 0:
+            self.attack()
+        if self.attack_cooldown > 0:
+            self.attack_cooldown -= 1
+        self.hit_collision()
 
         self.input()
         self.move()
