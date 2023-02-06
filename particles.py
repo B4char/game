@@ -30,7 +30,9 @@ class AttackParticles(pygame.sprite.Sprite):
         if self.frame_index >= len(self.particles_list):
             self.kill()
 
-    def update(self, flip, pos, screen):
+    def update(self, flip, pos, screen, kill):
+        if kill:
+            self.kill()
         self.pos = pos
         self.animate()
         self.flip = flip

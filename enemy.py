@@ -37,11 +37,13 @@ class Enemy(pygame.sprite.Sprite):
         self.speed = 2  # speed
         self.direction = 1  # which direction is the enemy facing ? (1 - right, -1 - left)
         self.flip = False  # where is the enemy facing ? (False - right, True - left)
-        self.idle = False
+        self.idle = False  # is the enemy idle ? (yes/no)
 
         # attack
         self.on_player = False  # can the enemy see the player ? (yes/no)
-        self.attacking = False
+        self.attacking = False  # if the enemy is currently attacking (mid attack animation)
+        self.hit = False  # if the enemy has already hit the player in the current attack - True, else - False
+        self.idle_attack = False  # is the enemy idle after the attack ? (yes/no)
 
         # health / status
         self.is_alive = True  # is the player alive ? (yes/no)
@@ -50,6 +52,9 @@ class Enemy(pygame.sprite.Sprite):
         # timers
         self.animation_timer = pygame.time.get_ticks()  # animation timer
         self.idle_timer = pygame.time.get_ticks()  # idle timer
+        self.attack_timer = pygame.time.get_ticks()  # attack timer
+        self.idle_attack_timer = pygame.time.get_ticks()  # idle after attack timer
+        self.hit_timer = pygame.time.get_ticks()  # hit timer
 
     def animate(self):
         # the function animates the enemy
@@ -84,7 +89,8 @@ class Enemy(pygame.sprite.Sprite):
             if self.action == 4:
                 self.frame_index = len(self.animation_list[self.action]) - 1
             elif self.action == 3:
-                self.action = 0
+                self.update_enemy_to_idle()
+                self.frame_index = 0
             else:
                 self.frame_index = 0
 
@@ -180,15 +186,16 @@ class Enemy(pygame.sprite.Sprite):
                         self.reverse()
 
     def random_movement(self):
-        self.check_reverse_collision()  # check for reverse collision
-        self.random_reverse()
+        if not self.idle_attack:
+            self.check_reverse_collision()  # check for reverse collision
+            self.random_reverse()
 
-        if pygame.time.get_ticks() - self.idle_timer > 5500:  # if the enemy was idle for the last 5.5 sec
-            self.idle = False
+            if pygame.time.get_ticks() - self.idle_timer > 5500:  # if the enemy was idle for the last 5.5 sec
+                self.idle = False
 
-        if not self.idle:  # the player isn't idle
-            self.update_enemy_to_move()
-            self.random_idle()
+            if not self.idle:  # the player isn't idle
+                self.update_enemy_to_move()
+                self.random_idle()
 
     def random_reverse(self):
         if randint(1, 1000) == 1:
@@ -200,12 +207,15 @@ class Enemy(pygame.sprite.Sprite):
             self.update_enemy_to_idle()
 
     def chase_movement(self):
-        if pygame.Rect.colliderect(self.attack_hitbox, player_sprite.sprite.hitbox):
-            self.update_enemy_to_attack()
+        if not self.idle_attack:
+            self.idle = False
+            if pygame.Rect.colliderect(self.attack_hitbox, player_sprite.sprite.hitbox):
+                self.update_enemy_to_attack()
 
-        if not self.attacking:
-            self.update_enemy_to_move()
-        self.face_player()
+            if not self.attacking:
+                self.update_enemy_to_move()
+
+            self.face_player()
 
     def face_player(self):
         player = player_sprite.sprite
@@ -242,9 +252,23 @@ class Enemy(pygame.sprite.Sprite):
         self.update_action(1)
 
     def update_enemy_to_attack(self):
+        self.attack_timer = pygame.time.get_ticks()
+        self.idle_attack_timer = pygame.time.get_ticks()
+        self.hit_timer = pygame.time.get_ticks()
         self.speed = 0
         self.update_action(3)
         self.attacking = True
+        self.idle_attack = True
+        AttackParticles(self.rect.topleft, self.scale, enemy_attack_particles)
+
+    def check_attack_collision(self):
+        player = player_sprite.sprite
+        if pygame.Rect.colliderect(self.attack_hitbox, player.hitbox):
+            # check if the enemy hasn't already hit the player
+            if not self.hit and pygame.time.get_ticks() - self.hit_timer > 400:
+                player.health -= 99
+                self.hit = True
+                print('hit')
 
     def update_enemy_to_death(self):
         self.speed = 0
@@ -262,17 +286,28 @@ class Enemy(pygame.sprite.Sprite):
             self.attack_hitbox.update(round(self.pos.x) + 25, round(self.pos.y),
                                       self.attack_hitbox.width, self.attack_hitbox.height)  # attack hitbox rect
 
+    def update_timers(self):
+        if pygame.time.get_ticks() - self.attack_timer > 450:
+            self.attacking = False
+            self.hit = False
+        else:
+            self.check_attack_collision()
+
+        if pygame.time.get_ticks() - self.idle_attack_timer > 3000:
+            self.idle_attack = False
+
     def update(self, shift_x):
-        pygame.draw.rect(self.display_surface, 'black', self.vision_rect, 2)  # vision
-        # pygame.draw.rect(self.display_surface, 'green', self.attack_hitbox, 2)  # hitbox
-        pygame.draw.rect(self.display_surface, 'red', self.rect, 2)  # self.rect
-        pygame.draw.rect(self.display_surface, 'green', self.old_rect, 2)  # self.rect
+        # pygame.draw.rect(self.display_surface, 'black', self.vision_rect, 2)  # vision
+        # pygame.draw.rect(self.display_surface, 'green', self.attack_hitbox, 2)  # attack hitbox
+        # pygame.draw.rect(self.display_surface, 'red', self.rect, 2)  # rect
+        # pygame.draw.rect(self.display_surface, 'green', self.old_rect, 2)  # old rect
 
         self.check_alive()
         self.update_rectangles()
 
         # enemy movement:
         if self.is_alive:  # the enemy is alive
+            self.update_timers()
             self.check_vision_collision()
             if player_sprite.sprite.is_alive:  # the player is alive
                 if self.on_player:  # the enemy is on the player (chasing the player)
@@ -288,3 +323,5 @@ class Enemy(pygame.sprite.Sprite):
 
         # animation:
         self.animate()
+        enemy_attack_particles.update(self.flip, self.pos, self.display_surface, not self.is_alive)
+        enemy_attack_particles.draw(self.display_surface)

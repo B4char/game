@@ -197,7 +197,7 @@ class Player(pygame.sprite.Sprite):
             for enemy in enemy_sprites.sprites():
                 if pygame.Rect.colliderect(self.attack_hitbox, enemy.rect) and enemy.is_alive:
                     if not self.hit:
-                        if pygame.time.get_ticks() - self.attack_timer_damage > 400:
+                        if pygame.time.get_ticks() - self.attack_timer_damage > 380:
                             enemy.health -= 200
                             self.hit = True
 
@@ -248,11 +248,15 @@ class Player(pygame.sprite.Sprite):
         self.old_rect = self.rect.copy()
         if self.flip:
             self.hitbox.update(self.pos.x + 6, self.pos.y, self.hitbox.width, self.hitbox.height)
+            self.attack_hitbox.update(round(self.pos.x) - 30, round(self.pos.y) + 10,
+                                      self.attack_hitbox.width, self.attack_hitbox.height)
         else:
             self.hitbox.update(self.pos.x + 8, self.pos.y, self.hitbox.width, self.hitbox.height)
+            self.attack_hitbox.update(round(self.pos.x) + 20, round(self.pos.y) + 10,
+                                      self.attack_hitbox.width, self.attack_hitbox.height)
 
     def update(self, jump_event, attack_event):
-        pygame.draw.rect(self.surface_display, 'red', self.hitbox, 2)
+        # pygame.draw.rect(self.surface_display, 'red', self.hitbox, 2)
         self.jump_event = jump_event
         self.check_alive()
 
@@ -272,15 +276,8 @@ class Player(pygame.sprite.Sprite):
         if self.direction.magnitude() != 0:
             self.direction = self.direction.normalize()
 
-        if self.flip:
-            self.attack_hitbox.update(round(self.pos.x) - 30, round(self.pos.y) + 10,
-                                      self.attack_hitbox.width, self.attack_hitbox.height)
-        else:
-            self.attack_hitbox.update(round(self.pos.x) + 20, round(self.pos.y) + 10,
-                                      self.attack_hitbox.width, self.attack_hitbox.height)
-
         # animate the player
-        player_attack_particles.update(self.flip, self.pos, self.surface_display)
+        player_attack_particles.update(self.flip, self.pos, self.surface_display, not self.is_alive)
         player_attack_particles.draw(self.surface_display)
         self.animate()
         self.update_action()
