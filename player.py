@@ -37,6 +37,7 @@ class Player(pygame.sprite.Sprite):
         # hitbox
         self.attack_hitbox = pygame.rect.Rect(pos[0], pos[1], self.rect.width * 1.2, 55)
         self.hit = False
+        self.offset = False
 
         # movement:
         self.pos = pygame.math.Vector2(self.rect.topleft)
@@ -66,7 +67,7 @@ class Player(pygame.sprite.Sprite):
         elif self.action == 4:
             animation_speed = 85
         else:  # the player is dead
-            animation_speed = 100
+            animation_speed = 80
         # update image depending on current frame
         self.image = self.animation_list[self.action][self.frame_index]
         self.image = pygame.transform.flip(self.image, self.flip, False)
@@ -104,6 +105,7 @@ class Player(pygame.sprite.Sprite):
     def get_new_action(self):
         if not self.is_alive:
             new_action = 5
+            self.offset_death()
         elif self.action == 4:
             new_action = 4
         # check if the player on ground
@@ -200,7 +202,7 @@ class Player(pygame.sprite.Sprite):
                 if pygame.Rect.colliderect(self.attack_hitbox, enemy.rect) and enemy.is_alive:
                     if not self.hit:
                         if pygame.time.get_ticks() - self.attack_timer_damage > 380:
-                            enemy.health -= 200
+                            enemy.health -= 35
                             self.hit = True
 
     def move(self):
@@ -245,6 +247,12 @@ class Player(pygame.sprite.Sprite):
         if self.health <= 0:
             self.is_alive = False
 
+    def offset_death(self):
+        if not self.flip:
+            if not self.offset:
+                self.pos.x -= 28
+                self.offset = True
+
     def update_rectangles(self):
         # update rectangles:
         self.old_rect = self.rect.copy()
@@ -265,14 +273,18 @@ class Player(pygame.sprite.Sprite):
         # update player position:
         self.inside_level()
         self.update_rectangles()
-        # attack:
-        if attack_event and self.attack_cooldown == 0 and self.jump_speed == 0:
-            self.attack()
-        if self.attack_cooldown > 0:
-            self.attack_cooldown -= 1
-        self.hit_collision()
 
-        self.input()
+        if self.is_alive:  # the player is alive:
+            self.input()
+            # attack:
+            if attack_event and self.attack_cooldown == 0 and self.jump_speed == 0:
+                self.attack()
+            if self.attack_cooldown > 0:
+                self.attack_cooldown -= 1
+            self.hit_collision()
+        else:
+            self.speed = 0
+
         self.move()
 
         if self.direction.magnitude() != 0:
