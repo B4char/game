@@ -266,7 +266,7 @@ class Player(pygame.sprite.Sprite):
                                       self.attack_hitbox.width, self.attack_hitbox.height)
 
     def update(self, jump_event, attack_event):
-        pygame.draw.rect(self.surface_display, 'red', self.rect, 2)
+        # pygame.draw.rect(self.surface_display, 'red', self.rect, 2)
         self.jump_event = jump_event
         self.check_alive()
 
