@@ -83,7 +83,7 @@ class Player(pygame.sprite.Sprite):
                 self.attacking = False
             # if the animation has run out then reset back to the start
             if self.frame_index >= len(self.animation_list[self.action]):
-                if self.action == 2:  # 2 - jumping, 5 - death
+                if self.action == 2 or self.action == 5:  # 2 - jumping, 5 - death
                     self.frame_index = len(self.animation_list[self.action]) - 1
                 elif self.action == 4:  # 4 - attacking
                     self.action = 0
@@ -102,7 +102,9 @@ class Player(pygame.sprite.Sprite):
             self.frame_index = 0
 
     def get_new_action(self):
-        if self.action == 4:
+        if not self.is_alive:
+            new_action = 5
+        elif self.action == 4:
             new_action = 4
         # check if the player on ground
         elif self.on_ground:
@@ -256,7 +258,7 @@ class Player(pygame.sprite.Sprite):
                                       self.attack_hitbox.width, self.attack_hitbox.height)
 
     def update(self, jump_event, attack_event):
-        # pygame.draw.rect(self.surface_display, 'red', self.hitbox, 2)
+        pygame.draw.rect(self.surface_display, 'red', self.rect, 2)
         self.jump_event = jump_event
         self.check_alive()
 
