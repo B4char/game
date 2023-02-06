@@ -2,7 +2,7 @@ import pygame
 from settings import screen_height, screen_width
 from sprite_groups import player_sprite
 from level import Level
-from game_data import *
+from game_data import level_list
 from fps import FPS
 from health_bar import HealthBar
 
@@ -13,8 +13,8 @@ pygame.display.set_caption('Game')
 
 jump_event = False
 attack_event = False
-
-level = Level(level_1, screen)
+level = 7
+level = Level(level_list[level], screen)
 health_bar = HealthBar(screen)
 fps = FPS()
 

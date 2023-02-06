@@ -10,7 +10,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__(group)
         # image:
         self.surface_display = surface
-        self.scale = 2.5
+        self.scale = 2.3
 
         # player hp
         self.is_alive = True
@@ -136,7 +136,7 @@ class Player(pygame.sprite.Sprite):
         self.action = 4
         self.attacking = True
         self.frame_index = 0
-        self.attack_cooldown = 60
+        self.attack_cooldown = 90
         # attack !
 
     def input(self):
@@ -213,7 +213,7 @@ class Player(pygame.sprite.Sprite):
         # update and check collision in the y direction:
         # jump:
         if self.jump:
-            self.jump_speed = -12
+            self.jump_speed = -13
             self.jump = False
             self.on_ground = False
         # gravity:

@@ -61,13 +61,13 @@ class Level:
 
                     if sprite_type == 'enemy':
                         if value == '0':  # red
-                            Enemy(enemy_sprites, x, y + tile_size, 2.5, self.display_surface, 'red')
+                            Enemy(enemy_sprites, x, y + tile_size, 2.3, self.display_surface, 'red')
                         if value == '3':  # green
-                            Enemy(enemy_sprites, x, y + tile_size, 2.5, self.display_surface, 'green')
+                            Enemy(enemy_sprites, x, y + tile_size, 2.3, self.display_surface, 'green')
                         if value == '4':  # black
-                            Enemy(enemy_sprites, x, y + tile_size, 2.5, self.display_surface, 'black')
+                            Enemy(enemy_sprites, x, y + tile_size, 2.3, self.display_surface, 'black')
                         if value == '5':  # white
-                            Enemy(enemy_sprites, x, y + tile_size, 2.5, self.display_surface, 'white')
+                            Enemy(enemy_sprites, x, y + tile_size, 2.3, self.display_surface, 'white')
 
                     if sprite_type == 'enemy constraints':
                         if value == '1':  # right
@@ -96,18 +96,20 @@ class Level:
         player = player_sprite.sprite
         player_x = player.rect.centerx
         direction_x = player.direction.x
-
-        if (screen_width // 2) > player_x > player_constraint_sprites.sprites()[0].rect.right + 9 * tile_size + 10\
-                and direction_x < 0:
-            self.world_shift_x = permanent_speed
-            player.speed = 0
-        elif (screen_width // 2) < player_x < player_constraint_sprites.sprites()[1].rect.left - 9 * tile_size - 10\
-                and direction_x > 0:
-            self.world_shift_x = -permanent_speed
-            player.speed = 0
+        if player.is_alive:
+            if (screen_width // 2) > player_x > player_constraint_sprites.sprites()[0].rect.right + 9 * tile_size + 10\
+                    and direction_x < 0:
+                self.world_shift_x = permanent_speed
+                player.speed = 0
+            elif (screen_width // 2) < player_x < player_constraint_sprites.sprites()[1].rect.left - 9 * tile_size - 10\
+                    and direction_x > 0:
+                self.world_shift_x = -permanent_speed
+                player.speed = 0
+            else:
+                self.world_shift_x = 0
+                player.speed = permanent_speed
         else:
             self.world_shift_x = 0
-            player.speed = permanent_speed
 
     def update_text(self):
         self.number_of_enemies = 0

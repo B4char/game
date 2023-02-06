@@ -3,11 +3,10 @@ import pygame
 # setup sprite groups
 # particles:
 player_attack_particles = pygame.sprite.GroupSingle()
-enemy_attack_particles = pygame.sprite.GroupSingle()
 
 # player:
 player_sprite = pygame.sprite.GroupSingle()
-goal_sprite = pygame.sprite.GroupSingle()
+goal_sprite = pygame.sprite.Group()
 player_constraint_sprites = pygame.sprite.Group()
 
 # enemy

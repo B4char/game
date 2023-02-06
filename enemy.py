@@ -1,7 +1,7 @@
 import pygame
 from random import randint
 from support import create_enemy_animation_list
-from sprite_groups import enemy_constraint_sprites, terrain_sprites, player_sprite, enemy_attack_particles
+from sprite_groups import enemy_constraint_sprites, terrain_sprites, player_sprite
 from settings import gravity, enemy_health
 from particles import AttackParticles
 
@@ -29,7 +29,7 @@ class Enemy(pygame.sprite.Sprite):
         # rectangle for the attack hitbox
         self.attack_hitbox = pygame.rect.Rect(self.pos.x, self.pos.y, self.rect.width, self.rect.height)
         # rectangle for the enemy's vision
-        self.vision_rect = pygame.rect.Rect(self.pos.x, self.pos.y, 350, 50)
+        self.vision_rect = pygame.rect.Rect(self.pos.x, self.pos.y, 500, 50)
 
         # enemy variables:
         # movement
@@ -201,6 +201,7 @@ class Enemy(pygame.sprite.Sprite):
             self.update_enemy_to_idle()
 
     def chase_movement(self):
+        self.face_player()
         if not self.idle_attack:
             self.idle = False
             if pygame.Rect.colliderect(self.attack_hitbox, player_sprite.sprite.hitbox):
@@ -208,8 +209,6 @@ class Enemy(pygame.sprite.Sprite):
 
             if not self.attacking:
                 self.update_enemy_to_move()
-
-            self.face_player()
 
     def face_player(self):
         player = player_sprite.sprite
@@ -241,10 +240,6 @@ class Enemy(pygame.sprite.Sprite):
         self.speed = 2 * self.direction
         self.update_action(1)
 
-    def update_enemy_to_run(self):
-        self.speed = 3 * self.direction
-        self.update_action(1)
-
     def update_enemy_to_attack(self):
         self.attack_timer = pygame.time.get_ticks()
         self.idle_attack_timer = pygame.time.get_ticks()
@@ -259,8 +254,8 @@ class Enemy(pygame.sprite.Sprite):
         player = player_sprite.sprite
         if pygame.Rect.colliderect(self.attack_hitbox, player.hitbox):
             # check if the enemy hasn't already hit the player
-            if not self.hit and pygame.time.get_ticks() - self.hit_timer > 400:
-                player.health -= 25
+            if not self.hit and pygame.time.get_ticks() - self.hit_timer > 200:
+                player.health -= randint(4, 9)
                 self.hit = True
                 print(player.health)
 
@@ -272,11 +267,11 @@ class Enemy(pygame.sprite.Sprite):
         # update rectangles:
         self.old_rect = self.rect.copy()  # update old_rectangle
         if self.flip:  # the enemy is facing left
-            self.vision_rect.topright = (self.rect.right + 50, self.rect.top + 10)  # vision rect
+            self.vision_rect.topright = (self.rect.right + 150, self.rect.top + 10)  # vision rect
             self.attack_hitbox.update(round(self.pos.x) - 30, round(self.pos.y),
                                       self.attack_hitbox.width, self.attack_hitbox.height)  # attack hitbox rect
         else:  # the enemy is facing right
-            self.vision_rect.topleft = (self.rect.left - 50, self.rect.top + 10)  # vision rect
+            self.vision_rect.topleft = (self.rect.left - 150, self.rect.top + 10)  # vision rect
             self.attack_hitbox.update(round(self.pos.x) + 25, round(self.pos.y),
                                       self.attack_hitbox.width, self.attack_hitbox.height)  # attack hitbox rect
 
@@ -287,15 +282,18 @@ class Enemy(pygame.sprite.Sprite):
         else:
             self.check_attack_collision()
 
-        if pygame.time.get_ticks() - self.idle_attack_timer > 1700:
+        if pygame.time.get_ticks() - self.idle_attack_timer > 1400:
             self.idle_attack = False
 
-    def update(self, shift_x):
-        # pygame.draw.rect(self.display_surface, 'black', self.vision_rect, 2)  # vision
-        # pygame.draw.rect(self.display_surface, 'green', self.attack_hitbox, 2)  # attack hitbox
-        # pygame.draw.rect(self.display_surface, 'red', self.rect, 2)  # rect
-        # pygame.draw.rect(self.display_surface, 'green', self.old_rect, 2)  # old rect
+    def enable_hitbox(self):
+        # enables hitbox for debug
+        pygame.draw.rect(self.display_surface, 'green', self.vision_rect, 2)  # vision
+        pygame.draw.rect(self.display_surface, 'red', self.attack_hitbox, 2)  # attack hitbox
+        pygame.draw.rect(self.display_surface, 'black', self.rect, 2)  # rect
+        pygame.draw.rect(self.display_surface, 'lightblue', self.old_rect, 2)  # old rect
 
+    def update(self, shift_x):
+        # self.enable_hitbox()
         self.check_alive()
         self.update_rectangles()
 
