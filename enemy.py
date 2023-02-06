@@ -2,7 +2,7 @@ import pygame
 from random import randint
 from support import create_enemy_animation_list
 from sprite_groups import enemy_constraint_sprites, terrain_sprites, player_sprite, enemy_attack_particles
-from settings import gravity
+from settings import gravity, enemy_health
 from particles import AttackParticles
 
 
@@ -47,7 +47,7 @@ class Enemy(pygame.sprite.Sprite):
 
         # health / status
         self.is_alive = True  # is the player alive ? (yes/no)
-        self.health = 150  # enemy health
+        self.health = enemy_health  # enemy health
 
         # timers
         self.animation_timer = pygame.time.get_ticks()  # animation timer
@@ -166,14 +166,6 @@ class Enemy(pygame.sprite.Sprite):
         if self.health <= 0:
             self.is_alive = False
 
-    # def hit_collision(self):
-        # player = player_sprite.sprite
-        # if self.hitting:
-            # if pygame.Rect.colliderect(self.attack_hitbox, player.rect) and player.is_alive:
-            # if not self.hit:
-            # player.health -= 1
-            # self.hit = True
-
     def check_reverse_collision(self):
         reverse_sprites = pygame.sprite.spritecollide(self, enemy_constraint_sprites, False)
         if reverse_sprites:
@@ -266,9 +258,9 @@ class Enemy(pygame.sprite.Sprite):
         if pygame.Rect.colliderect(self.attack_hitbox, player.hitbox):
             # check if the enemy hasn't already hit the player
             if not self.hit and pygame.time.get_ticks() - self.hit_timer > 400:
-                player.health -= 99
+                player.health -= 25
                 self.hit = True
-                print('hit')
+                print(player.health)
 
     def update_enemy_to_death(self):
         self.speed = 0
@@ -293,7 +285,7 @@ class Enemy(pygame.sprite.Sprite):
         else:
             self.check_attack_collision()
 
-        if pygame.time.get_ticks() - self.idle_attack_timer > 3000:
+        if pygame.time.get_ticks() - self.idle_attack_timer > 2250:
             self.idle_attack = False
 
     def update(self, shift_x):
