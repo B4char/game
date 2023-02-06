@@ -131,7 +131,6 @@ class Level:
         enemy_sprites.update(self.world_shift_x)
         enemy_sprites.draw(self.display_surface)
         enemy_constraint_sprites.update(self.world_shift_x)
-        enemy_constraint_sprites.draw(self.display_surface)
 
         # terrain
         terrain_sprites.update(self.world_shift_x)
