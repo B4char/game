@@ -20,8 +20,9 @@ class Level:
         self.add_to_tile_group(terrain_layout, 'terrain')
 
         # enemy
-        enemy_layout = import_csv_layout(level_data['enemy'])
-        self.add_to_tile_group(enemy_layout, 'enemy')
+        if not level_data.get('enemy') is None:
+            enemy_layout = import_csv_layout(level_data['enemy'])
+            self.add_to_tile_group(enemy_layout, 'enemy')
 
         # player
         player_layout = import_csv_layout(level_data['player'])
@@ -29,8 +30,9 @@ class Level:
 
         # constraint
         # enemy
-        constraint_layout = import_csv_layout(level_data['enemy constraints'])
-        self.add_to_tile_group(constraint_layout, 'enemy constraints')
+        if not level_data.get('enemy constraints') is None:
+            enemy_constraint_layout = import_csv_layout(level_data['enemy constraints'])
+            self.add_to_tile_group(enemy_constraint_layout, 'enemy constraints')
         # player
         player_constraint_layout = import_csv_layout(level_data['player constraints'])
         self.add_to_tile_group(player_constraint_layout, 'player constraints')

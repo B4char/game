@@ -56,6 +56,8 @@ class Enemy(pygame.sprite.Sprite):
         self.idle_attack_timer = pygame.time.get_ticks()  # idle after attack timer
         self.hit_timer = pygame.time.get_ticks()  # hit timer
 
+        self.attack_particles_sprite = pygame.sprite.GroupSingle()  # a sprite group for the attack particles
+
     def animate(self):
         # the function animates the enemy
 
@@ -251,7 +253,7 @@ class Enemy(pygame.sprite.Sprite):
         self.update_action(3)
         self.attacking = True
         self.idle_attack = True
-        AttackParticles(self.rect.topleft, self.scale, enemy_attack_particles)
+        AttackParticles(self.rect.topleft, self.scale, self.attack_particles_sprite)
 
     def check_attack_collision(self):
         player = player_sprite.sprite
@@ -279,13 +281,13 @@ class Enemy(pygame.sprite.Sprite):
                                       self.attack_hitbox.width, self.attack_hitbox.height)  # attack hitbox rect
 
     def update_timers(self):
-        if pygame.time.get_ticks() - self.attack_timer > 450:
+        if pygame.time.get_ticks() - self.attack_timer > 500:
             self.attacking = False
             self.hit = False
         else:
             self.check_attack_collision()
 
-        if pygame.time.get_ticks() - self.idle_attack_timer > 2250:
+        if pygame.time.get_ticks() - self.idle_attack_timer > 1700:
             self.idle_attack = False
 
     def update(self, shift_x):
@@ -315,5 +317,5 @@ class Enemy(pygame.sprite.Sprite):
 
         # animation:
         self.animate()
-        enemy_attack_particles.update(self.flip, self.pos, self.display_surface, not self.is_alive)
-        enemy_attack_particles.draw(self.display_surface)
+        self.attack_particles_sprite.update(self.flip, self.pos, self.display_surface, not self.is_alive)
+        self.attack_particles_sprite.draw(self.display_surface)
