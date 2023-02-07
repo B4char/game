@@ -5,6 +5,7 @@ from level import Level
 from game_data import level_list
 from fps import FPS
 from health_bar import HealthBar
+from support import clear_level
 
 pygame.init()
 screen = pygame.display.set_mode((screen_width, screen_height))
@@ -13,14 +14,17 @@ pygame.display.set_caption('Game')
 
 jump_event = False
 attack_event = False
-level = 7
-level = Level(level_list[level], screen)
+num_level = 0
+level = Level(level_list[num_level], screen)
 health_bar = HealthBar(screen)
 fps = FPS()
 
 run = True
 while run:
-
+    if level.next_level:
+        num_level += 1
+        clear_level()
+        level = Level(level_list[num_level], screen)
     jump_event = False
     attack_event = False
 

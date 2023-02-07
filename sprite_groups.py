@@ -15,5 +15,7 @@ enemy_constraint_sprites = pygame.sprite.Group()
 
 # level
 terrain_sprites = pygame.sprite.Group()
-grass_and_walls_sprites = pygame.sprite.Group()
 cloud_sprites = pygame.sprite.Group()
+stone_sprites = pygame.sprite.Group()
+tree_sprites = pygame.sprite.Group()
+mountain_sprites = pygame.sprite.Group()

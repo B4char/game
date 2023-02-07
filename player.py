@@ -202,7 +202,7 @@ class Player(pygame.sprite.Sprite):
                 if pygame.Rect.colliderect(self.attack_hitbox, enemy.rect) and enemy.is_alive:
                     if not self.hit:
                         if pygame.time.get_ticks() - self.attack_timer_damage > 380:
-                            enemy.health -= 35
+                            enemy.health -= 200
                             self.hit = True
 
     def move(self):

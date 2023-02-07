@@ -2,6 +2,7 @@ from csv import reader
 import pygame.image
 from settings import tile_size
 from os import listdir, walk
+from sprite_groups import *
 
 
 def import_folder(path, scale):
@@ -86,3 +87,14 @@ def create_attack_particles(scale):
 
         particles_list.append(animation_img)
     return particles_list
+
+
+def clear_level():
+    enemy_sprites.empty()
+    terrain_sprites.empty()
+    player_sprite.empty()
+    enemy_constraint_sprites.empty()
+    player_constraint_sprites.empty()
+    goal_sprite.empty()
+    stone_sprites.empty()
+    tree_sprites.empty()

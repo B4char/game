@@ -2,14 +2,18 @@ level_list = [
     # level 0
     {'player': 'levels/0/level_0_player.csv',
      'player constraints': 'levels/0/level_0_player_constraints.csv',
-     'terrain': 'levels/0/level_0_terrain.csv'},
+     'terrain': 'levels/0/level_0_terrain.csv',
+     'trees': 'levels/0/level_0_trees.csv',
+     'stones': 'levels/0/level_0_stones.csv'},
 
     # level 1
     {'player': 'levels/1/level_1_player.csv',
      'enemy': 'levels/1/level_1_enemy.csv',
      'terrain': 'levels/1/level_1_terrain.csv',
      'enemy constraints': 'levels/1/level_1_enemy_constraints.csv',
-     'player constraints': 'levels/1/level_1_player_constraints.csv'},
+     'player constraints': 'levels/1/level_1_player_constraints.csv',
+     'trees': 'levels/1/level_1_trees.csv',
+     'stones': 'levels/1/level_1_stones.csv'},
 
     # level 2
     {'player': 'levels/2/level_2_player.csv',
