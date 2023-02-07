@@ -50,7 +50,7 @@ class Level:
         self.sky = Sky()
         mountain_tile = pygame.image.load('graphics/decoration/sky/background_middle.png').convert_alpha()
         mountain_tile = pygame.transform.scale(mountain_tile, (1440, 900))
-        for x in range(0, 3):
+        for x in range(0, 2):
             StaticTile(mountain_sprites, (0, 0), x * mountain_tile.get_width(), - 120, mountain_tile)
 
     def add_to_tile_group(self, layout, sprite_type):
