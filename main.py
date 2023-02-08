@@ -1,5 +1,5 @@
 import pygame
-from settings import screen_height, screen_width
+from settings import screen_height, screen_width, player_max_health
 from sprite_groups import player_sprite
 from level import Level
 from game_data import level_list
@@ -17,7 +17,7 @@ jump_event = False
 attack_event = False
 num_level = 0
 
-level = Level(level_list[num_level], screen)
+level = Level(level_list[num_level], screen, player_max_health)
 health_bar = HealthBar(screen)
 fps = FPS()
 fade = Fade()
@@ -32,8 +32,9 @@ while run:
         can_fade_out = True
         if pygame.time.get_ticks() - level.reset_timer > 1000:
             num_level += 1
+            temp_health = player_sprite.sprite.health
             clear_level()
-            level = Level(level_list[num_level], screen)
+            level = Level(level_list[num_level], screen, temp_health)
             can_fade_in = True
             can_fade_out = False
 
@@ -63,6 +64,7 @@ while run:
     # health bar
     health_bar.update()
     health_bar.draw_health_bar()
+    health_bar.update_hp(player_sprite.sprite.health)
 
     fps.render(screen)
 

@@ -10,7 +10,7 @@ from buttons import Button
 
 
 class Level:
-    def __init__(self, level_data, surface):
+    def __init__(self, level_data, surface, health):
         # general setup
         self.display_surface = surface
         self.world_shift_x = 0
@@ -19,6 +19,7 @@ class Level:
         self.next_level = False
         self.updated = False
         self.reset_timer = pygame.time.get_ticks()
+        self.player_health = health
 
         # terrain:
         terrain_layout = import_csv_layout(level_data['terrain'])
@@ -100,7 +101,7 @@ class Level:
                 # player
                 if value == '0':
                     Player(self.display_surface, (x, y - 10), player_sprite,
-                           [terrain_sprites])
+                           [terrain_sprites], self.player_health)
                 # goal
                 if value == '1':
                     hat_surface = pygame.image.load('graphics/character/player_end.png').convert_alpha()

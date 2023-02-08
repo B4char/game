@@ -6,7 +6,7 @@ from particles import AttackParticles
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, surface, pos, group, obstacles):
+    def __init__(self, surface, pos, group, obstacles, health):
         super().__init__(group)
         # image:
         self.surface_display = surface
@@ -14,7 +14,7 @@ class Player(pygame.sprite.Sprite):
 
         # player hp
         self.is_alive = True
-        self.health = player_health
+        self.health = health
         self.max_health = player_max_health
         self.update_kill_time = pygame.time.get_ticks()
 
@@ -246,6 +246,7 @@ class Player(pygame.sprite.Sprite):
     def check_alive(self):
         if self.health <= 0:
             self.is_alive = False
+            self.health = 0
 
     def offset_death(self):
         if not self.flip:

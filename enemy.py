@@ -2,7 +2,7 @@ import pygame
 from random import randint
 from support import create_enemy_animation_list
 from sprite_groups import enemy_constraint_sprites, terrain_sprites, player_sprite
-from settings import gravity, enemy_health
+from settings import gravity, enemy_max_health
 from particles import AttackParticles
 
 
@@ -47,7 +47,7 @@ class Enemy(pygame.sprite.Sprite):
 
         # health / status
         self.is_alive = True  # is the player alive ? (yes/no)
-        self.health = enemy_health  # enemy health
+        self.health = enemy_max_health  # enemy health
 
         # timers
         self.animation_timer = pygame.time.get_ticks()  # animation timer
