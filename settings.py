@@ -10,6 +10,7 @@ screen_width = 20*64
 # text
 fps_font = pygame.font.SysFont('Hackbot Free Trial', 30)
 kills_font = pygame.font.SysFont('Hackbot Free Trial', 25)
+goal_font = pygame.font.SysFont('Hackbot Free Trial', 20)
 
 # game variables
 gravity = 0.7

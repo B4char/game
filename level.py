@@ -6,6 +6,7 @@ from tiles import StaticTile, Tile
 from enemy import Enemy
 from player import Player
 from decoration import Sky
+from buttons import Button
 
 
 class Level:
@@ -14,9 +15,9 @@ class Level:
         self.display_surface = surface
         self.world_shift_x = 0
         self.number_of_enemies = 0
+        self.draw_goal = False
         self.next_level = False
         self.updated = False
-
         self.reset_timer = pygame.time.get_ticks()
 
         # terrain:
@@ -104,6 +105,8 @@ class Level:
                 if value == '1':
                     hat_surface = pygame.image.load('graphics/character/player_end.png').convert_alpha()
                     StaticTile(goal_sprite, (tile_size, tile_size), x, y, hat_surface)
+                    Button(goal_button_sprite, x - 20, y + -30, self.display_surface)
+                    print(x, y)
 
     def scroll_x(self):
         player = player_sprite.sprite
@@ -134,8 +137,24 @@ class Level:
         textRect.center = (152, 81)
         return text, textRect
 
+    def check_goal_collision(self):
+        if self.number_of_enemies == 0:
+            if pygame.sprite.spritecollide(player_sprite.sprite, goal_sprite, False):
+                self.draw_goal = True
+
+                keys = pygame.key.get_pressed()
+
+                if keys[pygame.K_e]:
+                    if not self.updated:
+                        self.reset_timer = pygame.time.get_ticks()
+                        self.next_level = True
+                        self.updated = True
+            else:
+                self.draw_goal = False
+
     def run(self):
         self.scroll_x()
+        self.check_goal_collision()
 
         # text
         text, textRect = self.update_text()
@@ -167,7 +186,7 @@ class Level:
 
         self.display_surface.blit(text, textRect)
 
-        if self.number_of_enemies == 0 and not self.updated:
-            self.next_level = True
-            self.reset_timer = pygame.time.get_ticks()
-            self.updated = True
+        if self.draw_goal:
+            goal_button_sprite.draw(self.display_surface)
+            self.display_surface.blit(goal_button_sprite.sprite.text, goal_button_sprite.sprite.text_rect)
+        goal_button_sprite.update(self.world_shift_x)
