@@ -1,6 +1,6 @@
 from csv import reader
 import pygame.image
-from settings import tile_size, screen_width, screen_height
+from settings import tile_size
 from os import listdir, walk
 from sprite_groups import *
 
@@ -74,6 +74,17 @@ def create_enemy_animation_list(scale, color):
                                                                    int(animation_img.get_height() * scale)))
             temp_list.append(animation_img)
         animation_images.append(temp_list)
+    return animation_images
+
+
+def create_npc_animation_list(scale, color):
+    animation_images = []
+    action_length = len(listdir(f'graphics/npc/{color}'))
+    for i in range(action_length):
+        animation_img = pygame.image.load(f'graphics/npc/{color}/{i}.png').convert_alpha()
+        animation_img = pygame.transform.scale(animation_img, (int(animation_img.get_width() * scale),
+                                                               int(animation_img.get_height() * scale)))
+        animation_images.append(animation_img)
     return animation_images
 
 

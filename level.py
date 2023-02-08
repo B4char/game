@@ -7,6 +7,7 @@ from enemy import Enemy
 from player import Player
 from decoration import Sky
 from buttons import Button
+from npcs import Npc
 
 
 class Level:
@@ -52,6 +53,10 @@ class Level:
         tree_layout = import_csv_layout(level_data['trees'])
         self.add_to_tile_group(tree_layout, 'trees')
 
+        if not level_data.get('npc') is None:
+            npc_layout = import_csv_layout(level_data['npc'])
+            self.add_to_tile_group(npc_layout, 'npc')
+
         self.sky = Sky()
         mountain_tile = pygame.image.load('graphics/decoration/sky/background_middle.png').convert_alpha()
         mountain_tile = pygame.transform.scale(mountain_tile, (1440, 900))
@@ -70,7 +75,7 @@ class Level:
                         StaticTile(terrain_sprites, (tile_size, tile_size), x, y, tile_surface)
 
                     if sprite_type == 'enemy':
-                        Enemy(enemy_sprites, x, y + tile_size, 2.3, self.display_surface, 'white')
+                        Enemy(enemy_sprites, x, y, 2.3, self.display_surface, 'white')
                         self.number_of_enemies += 1
 
                     if sprite_type == 'enemy constraints':
@@ -92,6 +97,10 @@ class Level:
                         tree_surface = pygame.transform.scale(tree_surface, (tree_surface.get_width() * 2,
                                                                              tree_surface.get_height()*2))
                         StaticTile(tree_sprites, (tile_size, tile_size), x + randint(-48, 48), y - 192, tree_surface)
+
+                    if sprite_type == 'npc':
+                        if value == '0':
+                            Npc(x, y, 2.3, 'midnight_blue', npc_sprites)
 
     def player_setup(self, layout):
         for row_index, row in enumerate(layout):
@@ -171,10 +180,14 @@ class Level:
         stone_sprites.update(self.world_shift_x)
         stone_sprites.draw(self.display_surface)
 
-        # enemy
+        # enemies
         enemy_sprites.update(self.world_shift_x)
         enemy_sprites.draw(self.display_surface)
         enemy_constraint_sprites.update(self.world_shift_x)
+
+        # NPCs
+        npc_sprites.update(self.world_shift_x)
+        npc_sprites.draw(self.display_surface)
 
         # terrain
         terrain_sprites.update(self.world_shift_x)

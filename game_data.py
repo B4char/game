@@ -4,7 +4,8 @@ level_list = [
      'player constraints': 'levels/0/level_0_player_constraints.csv',
      'terrain': 'levels/0/level_0_terrain.csv',
      'trees': 'levels/0/level_0_trees.csv',
-     'stones': 'levels/0/level_0_stones.csv'},
+     'stones': 'levels/0/level_0_stones.csv',
+     'npc': 'levels/0/level_0_npc.csv'},
 
     # level 1
     {'player': 'levels/1/level_1_player.csv',

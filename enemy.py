@@ -15,13 +15,13 @@ class Enemy(pygame.sprite.Sprite):
         # animation:
         self.animation_list = create_enemy_animation_list(scale, color)
         self.frame_index = 0  # current frame in the animation list
-        self.action = 1  # 0 - idle, 1 - walk, 2 - fall, 3 - attack, 4 - death
+        self.action = 1  # 0 - midnight_blue, 1 - walk, 2 - fall, 3 - attack, 4 - death
         self.image = self.animation_list[self.action][self.frame_index]
 
         # rect and position:
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
-        self.rect.y -= 110 - self.image.get_size()[1]
+        self.rect.y -= 32 - self.image.get_size()[1]
         self.old_rect = self.rect.copy()
         self.pos = pygame.math.Vector2(self.rect.topleft)
 
@@ -37,13 +37,13 @@ class Enemy(pygame.sprite.Sprite):
         self.speed = 2  # speed
         self.direction = 1  # which direction is the enemy facing ? (1 - right, -1 - left)
         self.flip = False  # where is the enemy facing ? (False - right, True - left)
-        self.idle = False  # is the enemy idle ? (yes/no)
+        self.idle = False  # is the enemy midnight_blue ? (yes/no)
 
         # attack
         self.on_player = False  # can the enemy see the player ? (yes/no)
         self.attacking = False  # if the enemy is currently attacking (mid attack animation)
         self.hit = False  # if the enemy has already hit the player in the current attack - True, else - False
-        self.idle_attack = False  # is the enemy idle after the attack ? (yes/no)
+        self.idle_attack = False  # is the enemy midnight_blue after the attack ? (yes/no)
 
         # health / status
         self.is_alive = True  # is the player alive ? (yes/no)
@@ -51,9 +51,9 @@ class Enemy(pygame.sprite.Sprite):
 
         # timers
         self.animation_timer = pygame.time.get_ticks()  # animation timer
-        self.idle_timer = pygame.time.get_ticks()  # idle timer
+        self.idle_timer = pygame.time.get_ticks()  # midnight_blue timer
         self.attack_timer = pygame.time.get_ticks()  # attack timer
-        self.idle_attack_timer = pygame.time.get_ticks()  # idle after attack timer
+        self.idle_attack_timer = pygame.time.get_ticks()  # midnight_blue after attack timer
         self.hit_timer = pygame.time.get_ticks()  # hit timer
 
         self.attack_particles_sprite = pygame.sprite.GroupSingle()  # a sprite group for the attack particles
@@ -61,7 +61,7 @@ class Enemy(pygame.sprite.Sprite):
     def animate(self):
         # the function animates the enemy
 
-        # the enemy is idle
+        # the enemy is midnight_blue
         if self.action == 0:
             animation_speed = 260
         # the enemy is walking
@@ -184,10 +184,10 @@ class Enemy(pygame.sprite.Sprite):
             self.check_reverse_collision()  # check for reverse collision
             self.random_reverse()
 
-            if pygame.time.get_ticks() - self.idle_timer > 5500:  # if the enemy was idle for the last 5.5 sec
+            if pygame.time.get_ticks() - self.idle_timer > 5500:  # if the enemy was midnight_blue for the last 5.5 sec
                 self.idle = False
 
-            if not self.idle:  # the player isn't idle
+            if not self.idle:  # the player isn't midnight_blue
                 self.update_enemy_to_move()
                 self.random_idle()
 
@@ -197,7 +197,7 @@ class Enemy(pygame.sprite.Sprite):
 
     def random_idle(self):
         if randint(1, 1200) == 1 and not self.idle:  # the enemy isn't idling rn
-            # idle the enemy
+            # midnight_blue the enemy
             self.update_enemy_to_idle()
 
     def chase_movement(self):

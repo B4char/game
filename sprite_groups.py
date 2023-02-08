@@ -19,6 +19,7 @@ cloud_sprites = pygame.sprite.Group()
 stone_sprites = pygame.sprite.Group()
 tree_sprites = pygame.sprite.Group()
 mountain_sprites = pygame.sprite.Group()
+npc_sprites = pygame.sprite.Group()
 
 # buttons:
 goal_button_sprite = pygame.sprite.GroupSingle()
