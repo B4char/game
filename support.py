@@ -1,6 +1,6 @@
 from csv import reader
 import pygame.image
-from settings import tile_size
+from settings import tile_size, screen_width, screen_height
 from os import listdir, walk
 from sprite_groups import *
 

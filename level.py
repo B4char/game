@@ -15,6 +15,9 @@ class Level:
         self.world_shift_x = 0
         self.number_of_enemies = 0
         self.next_level = False
+        self.updated = False
+
+        self.reset_timer = pygame.time.get_ticks()
 
         # terrain:
         terrain_layout = import_csv_layout(level_data['terrain'])
@@ -164,5 +167,7 @@ class Level:
 
         self.display_surface.blit(text, textRect)
 
-        if self.number_of_enemies == 0:
+        if self.number_of_enemies == 0 and not self.updated:
             self.next_level = True
+            self.reset_timer = pygame.time.get_ticks()
+            self.updated = True
