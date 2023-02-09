@@ -109,3 +109,5 @@ def clear_level():
     goal_sprite.empty()
     stone_sprites.empty()
     tree_sprites.empty()
+    npc_button_sprite.empty()
+    goal_button_sprite.empty()

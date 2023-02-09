@@ -1,4 +1,14 @@
 level_list = [
+    # tutorial
+    {'player': 'levels/tutorial/tutorial_map_player.csv',
+     'enemy': 'levels/tutorial/tutorial_map_enemy.csv',
+     'tutorial npc': 'levels/tutorial/tutorial_map_tutorial_npc.csv',
+     'terrain': 'levels/tutorial/tutorial_map_terrain.csv',
+     'stones': 'levels/tutorial/tutorial_map_stones.csv',
+     'trees': 'levels/tutorial/tutorial_map_trees.csv',
+     'player constraints': 'levels/tutorial/tutorial_map_player_constraints.csv',
+     'enemy constraints': 'levels/tutorial/tutorial_map_enemy_constraints.csv'},
+
     # level 0
     {'player': 'levels/0/level_0_player.csv',
      'player constraints': 'levels/0/level_0_player_constraints.csv',

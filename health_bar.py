@@ -1,5 +1,5 @@
 import pygame
-from settings import player_health, player_max_health
+from settings import player_max_health
 
 
 class HealthBar(pygame.sprite.Sprite):

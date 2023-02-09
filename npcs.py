@@ -13,6 +13,7 @@ class Npc(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.rect.y -= 32 - self.image.get_size()[1]
+        self.npc_rect = pygame.rect.Rect(x - 50, y - 25, 100, 100)
         self.flip = True
 
         self.animation_timer = pygame.time.get_ticks()
@@ -39,4 +40,5 @@ class Npc(pygame.sprite.Sprite):
         self.face_player()
         self.animate()
         self.rect.x += shift_x
+        self.npc_rect.x += shift_x
 

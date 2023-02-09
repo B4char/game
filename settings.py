@@ -15,6 +15,5 @@ goal_font = pygame.font.SysFont('Hackbot Free Trial', 20)
 # game variables
 gravity = 0.7
 permanent_speed = 4
-player_health = 100
 player_max_health = 100
 enemy_max_health = 100

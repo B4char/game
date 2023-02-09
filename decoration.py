@@ -1,5 +1,4 @@
 import pygame.image
-from tiles import StaticTile
 
 
 class Sky:

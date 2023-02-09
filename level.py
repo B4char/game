@@ -11,12 +11,16 @@ from npcs import Npc
 
 
 class Level:
-    def __init__(self, level_data, surface, health):
+    def __init__(self, level_data, surface, health, current_level):
         # general setup
+        self.current_level = current_level
         self.display_surface = surface
         self.world_shift_x = 0
         self.number_of_enemies = 0
         self.draw_goal = False
+        self.draw_tutorial = False
+        self.play_tutorial = False
+        self.back_to_lobby = False
         self.next_level = False
         self.updated = False
         self.reset_timer = pygame.time.get_ticks()
@@ -33,8 +37,9 @@ class Level:
             self.add_to_tile_group(enemy_layout, 'enemy')
 
         # player:
-        player_layout = import_csv_layout(level_data['player'])
-        self.player_setup(player_layout)
+        if not level_data.get('player') is None:
+            player_layout = import_csv_layout(level_data['player'])
+            self.player_setup(player_layout)
 
         # constraint
         # enemy:
@@ -42,20 +47,27 @@ class Level:
             enemy_constraint_layout = import_csv_layout(level_data['enemy constraints'])
             self.add_to_tile_group(enemy_constraint_layout, 'enemy constraints')
         # player:
-        player_constraint_layout = import_csv_layout(level_data['player constraints'])
-        self.add_to_tile_group(player_constraint_layout, 'player constraints')
+        if not level_data.get('player constraints') is None:
+            player_constraint_layout = import_csv_layout(level_data['player constraints'])
+            self.add_to_tile_group(player_constraint_layout, 'player constraints')
 
         # decoration
         # stones:
-        stone_layout = import_csv_layout(level_data['stones'])
-        self.add_to_tile_group(stone_layout, 'stones')
+        if not level_data.get('stones') is None:
+            stone_layout = import_csv_layout(level_data['stones'])
+            self.add_to_tile_group(stone_layout, 'stones')
 
-        tree_layout = import_csv_layout(level_data['trees'])
-        self.add_to_tile_group(tree_layout, 'trees')
+        if not level_data.get('trees') is None:
+            tree_layout = import_csv_layout(level_data['trees'])
+            self.add_to_tile_group(tree_layout, 'trees')
 
         if not level_data.get('npc') is None:
             npc_layout = import_csv_layout(level_data['npc'])
             self.add_to_tile_group(npc_layout, 'npc')
+
+        if not level_data.get('tutorial npc') is None:
+            tutorial_npc_layout = import_csv_layout(level_data['tutorial npc'])
+            self.add_to_tile_group(tutorial_npc_layout, 'tutorial npc')
 
         self.sky = Sky()
         mountain_tile = pygame.image.load('graphics/decoration/sky/background_middle.png').convert_alpha()
@@ -98,9 +110,13 @@ class Level:
                                                                              tree_surface.get_height()*2))
                         StaticTile(tree_sprites, (tile_size, tile_size), x + randint(-48, 48), y - 192, tree_surface)
 
-                    if sprite_type == 'npc':
+                    if sprite_type == 'npc' or sprite_type == 'tutorial npc':
                         if value == '0':
-                            Npc(x, y, 2.3, 'midnight_blue', npc_sprites)
+                            Npc(x, y, 2.3, 'blue', npc_sprite)
+                            if sprite_type == 'npc':
+                                Button(npc_button_sprite, x - 85, y - 35, self.display_surface, 'How To Play')
+                            else:
+                                Button(npc_button_sprite, x - 75, y - 35, self.display_surface, 'Let\'s Play')
 
     def player_setup(self, layout):
         for row_index, row in enumerate(layout):
@@ -115,8 +131,7 @@ class Level:
                 if value == '1':
                     hat_surface = pygame.image.load('graphics/character/player_end.png').convert_alpha()
                     StaticTile(goal_sprite, (tile_size, tile_size), x, y, hat_surface)
-                    Button(goal_button_sprite, x - 20, y + -30, self.display_surface)
-                    print(x, y)
+                    Button(goal_button_sprite, x - 20, y - 30, self.display_surface, 'Enter')
 
     def scroll_x(self):
         player = player_sprite.sprite
@@ -153,7 +168,6 @@ class Level:
                 self.draw_goal = True
 
                 keys = pygame.key.get_pressed()
-
                 if keys[pygame.K_e]:
                     if not self.updated:
                         self.reset_timer = pygame.time.get_ticks()
@@ -162,9 +176,26 @@ class Level:
             else:
                 self.draw_goal = False
 
+    def check_npc_collision(self):
+        if pygame.Rect.colliderect(player_sprite.sprite.rect, npc_sprite.sprite.npc_rect):
+            self.draw_tutorial = True
+
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_e]:
+                print('hello', self.updated, self.next_level)
+                if not self.updated:
+                    self.reset_timer = pygame.time.get_ticks()
+                    self.next_level = True
+                    self.updated = True
+        else:
+            self.draw_tutorial = False
+
     def run(self):
         self.scroll_x()
-        self.check_goal_collision()
+        if goal_sprite:
+            self.check_goal_collision()
+        if npc_sprite:
+            self.check_npc_collision()
 
         # text
         text, textRect = self.update_text()
@@ -186,8 +217,8 @@ class Level:
         enemy_constraint_sprites.update(self.world_shift_x)
 
         # NPCs
-        npc_sprites.update(self.world_shift_x)
-        npc_sprites.draw(self.display_surface)
+        npc_sprite.update(self.world_shift_x)
+        npc_sprite.draw(self.display_surface)
 
         # terrain
         terrain_sprites.update(self.world_shift_x)
@@ -204,3 +235,8 @@ class Level:
             goal_button_sprite.draw(self.display_surface)
             self.display_surface.blit(goal_button_sprite.sprite.text, goal_button_sprite.sprite.text_rect)
         goal_button_sprite.update(self.world_shift_x)
+
+        if self.draw_tutorial:
+            npc_button_sprite.draw(self.display_surface)
+            self.display_surface.blit(npc_button_sprite.sprite.text, npc_button_sprite.sprite.text_rect)
+        npc_button_sprite.update(self.world_shift_x)

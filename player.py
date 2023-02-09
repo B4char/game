@@ -1,7 +1,7 @@
 import pygame
 from support import create_player_animation_list
 from sprite_groups import terrain_sprites, player_attack_particles, enemy_sprites
-from settings import screen_width, player_health, player_max_health, gravity, permanent_speed
+from settings import screen_width, player_max_health, gravity, permanent_speed
 from particles import AttackParticles
 
 
@@ -27,7 +27,7 @@ class Player(pygame.sprite.Sprite):
         self.update_time = pygame.time.get_ticks()
         self.attack_timer_damage = pygame.time.get_ticks()
         self.animation_list = create_player_animation_list(self.scale)
-        self.action = 0  # 0 - midnight_blue, 1 - run, 2 - jump, 3 - fall, 4 - attack
+        self.action = 0  # 0 - blue, 1 - run, 2 - jump, 3 - fall, 4 - attack
         self.frame_index = 0
         self.image = self.animation_list[self.action][self.frame_index]
         self.rect = self.image.get_rect(topleft=pos)
