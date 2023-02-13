@@ -19,7 +19,7 @@ cloud_sprites = pygame.sprite.Group()
 stone_sprites = pygame.sprite.Group()
 tree_sprites = pygame.sprite.Group()
 mountain_sprites = pygame.sprite.Group()
-npc_sprite = pygame.sprite.GroupSingle()
+npc_sprite = pygame.sprite.Group()
 
 # menu
 menu_sprites = pygame.sprite.GroupSingle()

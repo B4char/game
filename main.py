@@ -65,6 +65,19 @@ while run:
             if num_level == 1 and create_level:  # if the player came from the main menu
                 level = Level(level_list[num_level], screen, player_max_health, num_level)  # create level 1
                 create_level = False
+            elif num_level == 1 and level.next_level:
+                can_fade_out = True
+                if pygame.time.get_ticks() - level.reset_timer > 1000:
+                    if level.entering_difficulty:
+                        num_level = 2
+                    else:
+                        num_level = 3
+                    temp_health = player_sprite.sprite.health
+                    clear_level()  # clear the level
+                    level = Level(level_list[num_level], screen,
+                                  temp_health, num_level)  # create a new level x
+                    can_fade_in = True
+                    can_fade_out = False
             else:  # the player came from another level
                 if level.next_level:  # if the player is going to the next level
                     can_fade_out = True

@@ -10,7 +10,7 @@ class MainMenu(pygame.sprite.Sprite):
         self.screen = screen
         self.fade_timer = pygame.time.get_ticks()
         self.frame_index = 0
-        self.animation_list = create_npc_animation_list(2.3, 'light_blue')
+        self.animation_list = create_npc_animation_list(2.3, 'purple')
         self.sky = pygame.surface.Surface((1280, 770))
         self.sky.fill((92, 211, 255))
 

@@ -18,13 +18,16 @@ class Level:
         self.world_shift_x = 0
         self.number_of_enemies = 0
         self.draw_goal = False
-        self.draw_tutorial = False
+        self.draw_text = False
         self.play_tutorial = False
         self.back_to_lobby = False
         self.next_level = False
         self.updated = False
         self.reset_timer = pygame.time.get_ticks()
         self.player_health = health
+        self.npc = ''
+        self.entering_difficulty = False
+        self.leaving_difficulty = False
 
         # terrain:
         terrain_layout = import_csv_layout(level_data['terrain'])
@@ -64,10 +67,6 @@ class Level:
         if not level_data.get('npc') is None:
             npc_layout = import_csv_layout(level_data['npc'])
             self.add_to_tile_group(npc_layout, 'npc')
-
-        if not level_data.get('tutorial npc') is None:
-            tutorial_npc_layout = import_csv_layout(level_data['tutorial npc'])
-            self.add_to_tile_group(tutorial_npc_layout, 'tutorial npc')
 
         self.sky = Sky()
         mountain_tile = pygame.image.load('graphics/decoration/sky/background_middle.png').convert_alpha()
@@ -110,13 +109,25 @@ class Level:
                                                                              tree_surface.get_height()*2))
                         StaticTile(tree_sprites, (tile_size, tile_size), x + randint(-48, 48), y - 192, tree_surface)
 
-                    if sprite_type == 'npc' or sprite_type == 'tutorial npc':
-                        if value == '0':
-                            Npc(x, y, 2.3, 'blue', npc_sprite)
-                            if sprite_type == 'npc':
-                                Button(npc_button_sprite, x - 85, y - 35, self.display_surface, 'How To Play')
+                    if sprite_type == 'npc':
+                        if value == '1':
+                            Npc(x, y, 2.3, 'blue', npc_sprite, 'Let\'s Play', self.display_surface)
+                            self.npc = 'tutorial'
+                        if value == '2':
+                            if self.current_level == 1:
+                                text = 'difficulty'
                             else:
-                                Button(npc_button_sprite, x - 75, y - 35, self.display_surface, 'Let\'s Play')
+                                text = 'Let\'s Play'
+                            Npc(x, y, 2.3, 'cyan', npc_sprite, text, self.display_surface)
+                            self.npc = 'difficulty'
+                        if value == '3':
+                            Npc(x, y, 2.3, 'green', npc_sprite, 'Easy', self.display_surface)
+                        if value == '4':
+                            Npc(x, y, 2.3, 'red', npc_sprite, 'Normal', self.display_surface)
+                        if value == '5':
+                            Npc(x, y, 2.3, 'black', npc_sprite, 'Hard', self.display_surface)
+                        if value == '6':
+                            Npc(x, y, 2.3, 'white', npc_sprite, 'Insane', self.display_surface)
 
     def player_setup(self, layout):
         for row_index, row in enumerate(layout):
@@ -177,18 +188,22 @@ class Level:
                 self.draw_goal = False
 
     def check_npc_collision(self):
-        if pygame.Rect.colliderect(player_sprite.sprite.rect, npc_sprite.sprite.npc_rect):
-            self.draw_tutorial = True
+        for sprite in npc_sprite.sprites():
+            if pygame.Rect.colliderect(player_sprite.sprite.rect, sprite.npc_rect):
+                sprite.draw_text()
 
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_e]:
-                print('hello', self.updated, self.next_level)
-                if not self.updated:
-                    self.reset_timer = pygame.time.get_ticks()
-                    self.next_level = True
-                    self.updated = True
-        else:
-            self.draw_tutorial = False
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_e]:
+                    if not self.updated:
+                        if self.npc == 'difficulty':
+                            if self.current_level == 1:
+                                self.entering_difficulty = True
+                            elif self.current_level == 2:
+                                self.leaving_difficulty = True
+
+                        self.reset_timer = pygame.time.get_ticks()
+                        self.next_level = True
+                        self.updated = True
 
     def run(self):
         self.scroll_x()
@@ -235,8 +250,3 @@ class Level:
             goal_button_sprite.draw(self.display_surface)
             self.display_surface.blit(goal_button_sprite.sprite.text, goal_button_sprite.sprite.text_rect)
         goal_button_sprite.update(self.world_shift_x)
-
-        if self.draw_tutorial:
-            npc_button_sprite.draw(self.display_surface)
-            self.display_surface.blit(npc_button_sprite.sprite.text, npc_button_sprite.sprite.text_rect)
-        npc_button_sprite.update(self.world_shift_x)

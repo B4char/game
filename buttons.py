@@ -28,10 +28,13 @@ class MenuButton(pygame.sprite.Sprite):
         self.y = self.rect.topleft[1]
 
     def check_pressed(self, pressed):
-        if pressed:
-            if self.x <= pygame.mouse.get_pos()[0] <= self.x + self.rect.width and\
-                    self.y <= pygame.mouse.get_pos()[1] <= self.y + self.rect.height:
+        if self.x <= pygame.mouse.get_pos()[0] <= self.x + self.rect.width and\
+                self.y <= pygame.mouse.get_pos()[1] <= self.y + self.rect.height:
+            self.image.set_alpha(235)
+            if pressed:
                 if self.type == 'play':
                     return 'play'
                 elif self.type == 'tutorial':
                     return 'tutorial'
+        else:
+            self.image.set_alpha(255)
