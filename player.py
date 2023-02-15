@@ -3,6 +3,9 @@ from support import create_player_animation_list
 from sprite_groups import terrain_sprites, player_attack_particles, enemy_sprites
 from settings import screen_width, player_max_health, gravity, permanent_speed
 from particles import AttackParticles
+from sounds import hit_sound, jump_sound
+
+pygame.mixer.pre_init(44100, -16, 2, 512)
 
 
 class Player(pygame.sprite.Sprite):
@@ -55,17 +58,19 @@ class Player(pygame.sprite.Sprite):
 
     def animate(self):
         # the player is idling or jumping
-        if self.action == 0 or self.action == 2:
+        if self.action == 0:
             animation_speed = 260
         # the player is running
         elif self.action == 1:
             animation_speed = 150
+        elif self.action == 2:
+            animation_speed = 150
         # the player is falling
         elif self.action == 3:
-            animation_speed = 250
+            animation_speed = 600
         # the player is attacking
         elif self.action == 4:
-            animation_speed = 85
+            animation_speed = 75
         else:  # the player is dead
             animation_speed = 80
         # update image depending on current frame
@@ -103,11 +108,20 @@ class Player(pygame.sprite.Sprite):
             self.frame_index = 0
 
     def get_new_action(self):
+        new_action = 0
         if not self.is_alive:
             new_action = 5
             self.offset_death()
         elif self.action == 4:
             new_action = 4
+        # check if the player isn't on ground
+        elif not self.on_ground:
+            # check if the player is falling
+            if self.falling:
+                new_action = 3
+            else:
+                # the player is jumping
+                new_action = 2
         # check if the player on ground
         elif self.on_ground:
             # check if the player is moving
@@ -116,14 +130,6 @@ class Player(pygame.sprite.Sprite):
             # the player isn't moving
             else:
                 new_action = 0
-        # check if the player isn't on ground
-        elif not self.on_ground:
-            # check if the player is falling
-            if self.falling:
-                new_action = 3
-            # the player is jumping
-            else:
-                new_action = 2
         # the player is doing nothing
         else:
             new_action = 0
@@ -131,6 +137,7 @@ class Player(pygame.sprite.Sprite):
         return new_action
 
     def attack(self):
+        hit_sound.play()
         self.attack_timer_damage = pygame.time.get_ticks()
         AttackParticles(self.rect.topleft, self.scale, player_attack_particles)
         self.action = 4
@@ -153,6 +160,9 @@ class Player(pygame.sprite.Sprite):
             self.direction.x = 0
 
         if self.jump_event and (self.on_ground or self.double_jump > 0):
+            self.action = 2
+            self.frame_index = 0
+            jump_sound.play()
             self.double_jump -= 1
             self.direction.y = -1
             self.jump_speed = 0

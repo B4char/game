@@ -12,12 +12,16 @@ from menu import MainMenu
 pygame.init()
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('Game')
-# clock = pygame.time.Clock()
 
 jump_event = False
 attack_event = False
 button_event = False
 num_level = 0
+
+can_play = True
+
+music_list = ['sounds/game_music.wav', 'sounds/menu_music.wav']
+pygame.mixer.music.set_volume(0.135)
 
 health_bar = HealthBar(screen)
 fps = FPS()
@@ -47,6 +51,8 @@ while run:
                 in_main_menu = False
                 can_fade_in = True
                 can_fade_out = False
+                can_play = True
+                pygame.mixer.music.fadeout(1000)
         elif check == 'tutorial' or checked == 'tutorial':  # if the player pressed the tutorial button
             checked = 'tutorial'
             can_fade_out = True
@@ -56,6 +62,8 @@ while run:
                 in_main_menu = False
                 can_fade_in = True
                 can_fade_out = False
+                can_play = True
+                pygame.mixer.music.fadeout(1000)
 
         button_sprites.update(button_event)
         button_sprites.draw(screen)
@@ -65,19 +73,6 @@ while run:
             if num_level == 1 and create_level:  # if the player came from the main menu
                 level = Level(level_list[num_level], screen, player_max_health, num_level)  # create level 1
                 create_level = False
-            elif num_level == 1 and level.next_level:
-                can_fade_out = True
-                if pygame.time.get_ticks() - level.reset_timer > 1000:
-                    if level.entering_difficulty:
-                        num_level = 2
-                    else:
-                        num_level = 3
-                    temp_health = player_sprite.sprite.health
-                    clear_level()  # clear the level
-                    level = Level(level_list[num_level], screen,
-                                  temp_health, num_level)  # create a new level x
-                    can_fade_in = True
-                    can_fade_out = False
             else:  # the player came from another level
                 if level.next_level:  # if the player is going to the next level
                     can_fade_out = True
@@ -122,6 +117,14 @@ while run:
         if fade.fully_faded:
             fade.update()
             can_fade_in = False
+
+    if can_play:
+        if in_main_menu:
+            pygame.mixer.music.load(music_list[1])
+        else:
+            pygame.mixer.music.load(music_list[0])
+        pygame.mixer.music.play(-1)
+        can_play = False
 
     # event loop:
     for event in pygame.event.get():

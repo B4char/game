@@ -14,16 +14,7 @@ level_list = [
      'player constraints': 'levels/0/level_0_player_constraints.csv',
      'terrain': 'levels/0/level_0_terrain.csv',
      'trees': 'levels/0/level_0_trees.csv',
-     'stones': 'levels/0/level_0_stones.csv',
-     'npc': 'levels/0/level_0_difficulty_npc.csv'},
-
-    # difficulty
-    {'player': 'levels/difficulty/difficulty_map_player.csv',
-     'npc': 'levels/difficulty/difficulty_map_difficulty_npcs.csv',
-     'terrain': 'levels/difficulty/difficulty_map_terrain.csv',
-     'stones': 'levels/difficulty/difficulty_map_stones.csv',
-     'trees': 'levels/difficulty/difficulty_map_trees.csv',
-     'player constraints': 'levels/difficulty/difficulty_map_player_constraints.csv',},
+     'stones': 'levels/0/level_0_stones.csv'},
 
     # level 1
     {'player': 'levels/1/level_1_player.csv',

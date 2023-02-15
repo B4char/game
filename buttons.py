@@ -1,5 +1,6 @@
 import pygame
 from settings import goal_font
+from sounds import button_sound
 
 
 class Button(pygame.sprite.Sprite):
@@ -26,15 +27,20 @@ class MenuButton(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=(x, y))
         self.x = self.rect.topleft[0]
         self.y = self.rect.topleft[1]
+        self.can_play = False
 
     def check_pressed(self, pressed):
         if self.x <= pygame.mouse.get_pos()[0] <= self.x + self.rect.width and\
                 self.y <= pygame.mouse.get_pos()[1] <= self.y + self.rect.height:
+            if self.can_play:
+                button_sound.play()
+                self.can_play = False
             self.image.set_alpha(235)
             if pressed:
-                if self.type == 'play':
-                    return 'play'
-                elif self.type == 'tutorial':
-                    return 'tutorial'
+                return self.type
+            else:
+                return ''
         else:
             self.image.set_alpha(255)
+            self.can_play = True
+            return ''

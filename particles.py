@@ -15,7 +15,7 @@ class AttackParticles(pygame.sprite.Sprite):
         self.scale = scale
 
     def animate(self):
-        animation_speed = 85
+        animation_speed = 75
         self.image = self.particles_list[self.frame_index]
         self.image = pygame.transform.flip(self.image, self.flip, False)
         if self.flip:

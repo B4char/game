@@ -4,7 +4,7 @@ from support import create_enemy_animation_list
 from sprite_groups import enemy_constraint_sprites, terrain_sprites, player_sprite
 from settings import gravity, enemy_max_health
 from particles import AttackParticles
-
+from sounds import hit_sound
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, group, x, y, scale, display_surface, color):
@@ -27,7 +27,7 @@ class Enemy(pygame.sprite.Sprite):
 
         # vision rect:
         # rectangle for the attack hitbox
-        self.attack_hitbox = pygame.rect.Rect(self.pos.x, self.pos.y, self.rect.width, self.rect.height)
+        self.attack_hitbox = pygame.rect.Rect(self.pos.x, self.pos.y, self.rect.width - 10, self.rect.height)
         # rectangle for the enemy's vision
         self.vision_rect = pygame.rect.Rect(self.pos.x, self.pos.y, 500, 50)
 
@@ -72,7 +72,7 @@ class Enemy(pygame.sprite.Sprite):
             animation_speed = 300
         # the enemy is attacking
         elif self.action == 3:
-            animation_speed = 85
+            animation_speed = 75
         # the enemy is dead
         else:
             animation_speed = 80
@@ -255,6 +255,7 @@ class Enemy(pygame.sprite.Sprite):
         if pygame.Rect.colliderect(self.attack_hitbox, player.hitbox):
             # check if the enemy hasn't already hit the player
             if not self.hit and pygame.time.get_ticks() - self.hit_timer > 200:
+                hit_sound.play()
                 player.health -= randint(4, 9)
                 self.hit = True
                 print(player.health)
@@ -268,7 +269,7 @@ class Enemy(pygame.sprite.Sprite):
         self.old_rect = self.rect.copy()  # update old_rectangle
         if self.flip:  # the enemy is facing left
             self.vision_rect.topright = (self.rect.right + 150, self.rect.top + 10)  # vision rect
-            self.attack_hitbox.update(round(self.pos.x) - 30, round(self.pos.y),
+            self.attack_hitbox.update(round(self.pos.x) - 15, round(self.pos.y),
                                       self.attack_hitbox.width, self.attack_hitbox.height)  # attack hitbox rect
         else:  # the enemy is facing right
             self.vision_rect.topleft = (self.rect.left - 150, self.rect.top + 10)  # vision rect

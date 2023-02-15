@@ -33,21 +33,18 @@ class MainMenu(pygame.sprite.Sprite):
 
     def animate(self):
         animation_speed = 150
-
         self.player_img = self.animation_list[self.frame_index]
-
         if pygame.time.get_ticks() - self.update_time > animation_speed:
             self.frame_index += 1
             self.update_time = pygame.time.get_ticks()
-
         if self.frame_index >= len(self.animation_list):
             self.frame_index = 0
 
     def scroll_x(self):
-        self.mountain_rect1.update(self.mountain_rect1.x - 1, self.mountain_rect1.y, self.mountain_rect1.width, self.mountain_rect1.height)
-        self.mountain_rect2.update(self.mountain_rect2.x - 1, self.mountain_rect2.y, self.mountain_rect2.width, self.mountain_rect2.height)
-        self.grass_rect1.update(self.grass_rect1.x - 2, self.grass_rect1.y, self.grass_rect1.width, self.grass_rect1.height)
-        self.grass_rect2.update(self.grass_rect2.x - 2, self.grass_rect2.y, self.grass_rect2.width, self.grass_rect2.height)
+        self.mountain_rect1.x -= 1
+        self.mountain_rect2.x -= 1
+        self.grass_rect1.x -= 2
+        self.grass_rect2.x -= 2
 
         if self.mountain_rect1.right <= 0:
             self.mountain_rect1.x = 1440
