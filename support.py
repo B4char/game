@@ -90,14 +90,29 @@ def create_npc_animation_list(scale, color):
 
 def create_attack_particles(scale):
     particles_list = []
-    action_length = len(listdir('graphics/attack_particles'))
+    action_length = len(listdir('graphics/particles/attack_particles'))
     for i in range(action_length):
-        animation_img = pygame.image.load(f'graphics/attack_particles/{i}.png').convert_alpha()
+        animation_img = pygame.image.load(f'graphics/particles/attack_particles/{i}.png').convert_alpha()
         animation_img = pygame.transform.scale(animation_img, (int(animation_img.get_width() * scale),
                                                                int(animation_img.get_height() * scale)))
 
         particles_list.append(animation_img)
     return particles_list
+
+
+def create_particles(scale):
+    particles_images = []
+    particles_types = ['jump', 'fall', 'run']
+    for particle in particles_types:
+        temp_list = []
+        action_length = len(listdir(f'graphics/particles/{particle}'))
+        for i in range(action_length):
+            particle_img = pygame.image.load(f'graphics/particles/{particle}/{i}.png').convert_alpha()
+            particle_img = pygame.transform.scale(particle_img, (int(particle_img.get_width() * scale),
+                                                                 int(particle_img.get_height() * scale)))
+            temp_list.append(particle_img)
+        particles_images.append(temp_list)
+    return particles_images
 
 
 def clear_level():

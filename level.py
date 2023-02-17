@@ -124,7 +124,7 @@ class Level:
                 if value == '1':
                     hat_surface = pygame.image.load('graphics/character/player_end.png').convert_alpha()
                     StaticTile(goal_sprite, (tile_size, tile_size), x, y, hat_surface)
-                    Button(goal_button_sprite, x - 20, y - 30, self.display_surface, 'Enter')
+                    Button(goal_button_sprite, x - 20, y - 20, self.display_surface, 'Enter')
 
     def scroll_x(self):
         player = player_sprite.sprite
@@ -206,6 +206,7 @@ class Level:
         enemy_sprites.update(self.world_shift_x)
         enemy_sprites.draw(self.display_surface)
         enemy_constraint_sprites.update(self.world_shift_x)
+        # enemy_constraint_sprites.draw(self.display_surface)
 
         # NPCs
         npc_sprite.update(self.world_shift_x)
@@ -231,3 +232,7 @@ class Level:
             npc_button_sprite.draw(self.display_surface)
             self.display_surface.blit(npc_button_sprite.sprite.text, npc_button_sprite.sprite.text_rect)
         npc_button_sprite.update(self.world_shift_x)
+
+        for particle in particles_sprite.sprites():
+            particle.update(player_sprite.sprite.flip, self.display_surface, self.world_shift_x)
+        particles_sprite.draw(self.display_surface)

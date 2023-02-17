@@ -1,8 +1,8 @@
 import pygame
 from support import create_player_animation_list
-from sprite_groups import terrain_sprites, player_attack_particles, enemy_sprites
+from sprite_groups import terrain_sprites, player_attack_particles, enemy_sprites, particles_sprite
 from settings import screen_width, player_max_health, gravity, permanent_speed
-from particles import AttackParticles
+from particles import AttackParticles, Particles
 from sounds import hit_sound, jump_sound
 
 pygame.mixer.pre_init(44100, -16, 2, 512)
@@ -56,6 +56,8 @@ class Player(pygame.sprite.Sprite):
         self.on_ground = False
         self.falling = False
 
+        self.run_particles_timer = pygame.time.get_ticks()
+
     def animate(self):
         # the player is idling or jumping
         if self.action == 0:
@@ -108,7 +110,6 @@ class Player(pygame.sprite.Sprite):
             self.frame_index = 0
 
     def get_new_action(self):
-        new_action = 0
         if not self.is_alive:
             new_action = 5
             self.offset_death()
@@ -127,6 +128,9 @@ class Player(pygame.sprite.Sprite):
             # check if the player is moving
             if self.direction.x != 0:
                 new_action = 1
+                if pygame.time.get_ticks() - self.run_particles_timer > 150:
+                    Particles(self.pos, particles_sprite, 2)
+                    self.run_particles_timer = pygame.time.get_ticks()
             # the player isn't moving
             else:
                 new_action = 0
@@ -160,6 +164,8 @@ class Player(pygame.sprite.Sprite):
             self.direction.x = 0
 
         if self.jump_event and (self.on_ground or self.double_jump > 0):
+            if self.on_ground:
+                Particles(self.rect.bottomleft, particles_sprite, 0)
             self.action = 2
             self.frame_index = 0
             jump_sound.play()
@@ -200,6 +206,9 @@ class Player(pygame.sprite.Sprite):
                         self.jump_speed = 0
                         self.double_jump = 2
 
+                    if self.rect.bottom >= sprite.rect.top and self.old_rect.bottom < sprite.old_rect.top:
+                        Particles(self.pos, particles_sprite, 1)
+
                     # collision on the top:
                     if self.rect.top <= sprite.rect.bottom and self.old_rect.top >= sprite.old_rect.bottom:
                         self.rect.top = sprite.rect.bottom
@@ -212,7 +221,7 @@ class Player(pygame.sprite.Sprite):
                 if pygame.Rect.colliderect(self.attack_hitbox, enemy.rect) and enemy.is_alive:
                     if not self.hit:
                         if pygame.time.get_ticks() - self.attack_timer_damage > 380:
-                            enemy.health -= 200
+                            enemy.health -= 35
                             self.hit = True
 
     def move(self):

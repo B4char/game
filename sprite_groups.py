@@ -3,6 +3,7 @@ import pygame
 # setup sprite groups
 # particles:
 player_attack_particles = pygame.sprite.GroupSingle()
+particles_sprite = pygame.sprite.Group()
 
 # player:
 player_sprite = pygame.sprite.GroupSingle()

@@ -22,8 +22,10 @@ class MainMenu(pygame.sprite.Sprite):
 
         self.grass1 = pygame.image.load('graphics/decoration/grass.png')
         self.grass2 = pygame.image.load('graphics/decoration/grass.png')
+        self.grass3 = pygame.image.load('graphics/decoration/grass.png')
         self.grass_rect1 = self.grass1.get_rect(topleft=(0, 600))
-        self.grass_rect2 = self.grass2.get_rect(topleft=(1440, 600))
+        self.grass_rect2 = self.grass2.get_rect(topleft=(720, 600))
+        self.grass_rect3 = self.grass3.get_rect(topleft=(1440, 600))
 
         self.player_img = self.animation_list[self.frame_index]
         self.update_time = pygame.time.get_ticks()
@@ -45,6 +47,7 @@ class MainMenu(pygame.sprite.Sprite):
         self.mountain_rect2.x -= 1
         self.grass_rect1.x -= 2
         self.grass_rect2.x -= 2
+        self.grass_rect3.x -= 2
 
         if self.mountain_rect1.right <= 0:
             self.mountain_rect1.x = 1440
@@ -54,6 +57,8 @@ class MainMenu(pygame.sprite.Sprite):
             self.grass_rect1.x = 1440
         elif self.grass_rect2.right <= 0:
             self.grass_rect2.x = 1440
+        elif self.grass_rect3.right <= 0:
+            self.grass_rect3.x = 1440
 
     def update(self, pressed) -> str:
         self.scroll_x()
@@ -62,6 +67,7 @@ class MainMenu(pygame.sprite.Sprite):
         self.screen.blit(self.mountain2, self.mountain_rect2.topleft)
         self.screen.blit(self.grass1, self.grass_rect1.topleft)
         self.screen.blit(self.grass2, self.grass_rect2.topleft)
+        self.screen.blit(self.grass3, self.grass_rect3.topleft)
         self.screen.blit(self.player_img, (640 - self.player_img.get_width() // 2, 536))
         self.animate()
         if self.play_button.check_pressed(pressed) == 'play':

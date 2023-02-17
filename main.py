@@ -20,7 +20,7 @@ num_level = 0
 
 can_play = True
 
-music_list = ['sounds/game_music.wav', 'sounds/menu_music.wav']
+music_list = ['sounds/game_music.wav', 'sounds/menu_music.wav', 'sounds/tutorial_music.wav']
 pygame.mixer.music.set_volume(0.135)
 
 health_bar = HealthBar(screen)
@@ -122,7 +122,10 @@ while run:
         if in_main_menu:
             pygame.mixer.music.load(music_list[1])
         else:
-            pygame.mixer.music.load(music_list[0])
+            if playing_tutorial:
+                pygame.mixer.music.load(music_list[2])
+            else:
+                pygame.mixer.music.load(music_list[0])
         pygame.mixer.music.play(-1)
         can_play = False
 
