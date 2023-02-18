@@ -109,7 +109,7 @@ class Level:
                     if sprite_type == 'npc':
                         if value == '1':
                             Npc(x, y, 2.3, 'blue', npc_sprite)
-                            Button(npc_button_sprite, x - 70, y - 35, self.display_surface, 'Let\'s Play')
+                            Button(npc_button_sprite, x - 80, y - 35, self.display_surface, 'Let\'s Play')
 
     def player_setup(self, layout):
         for row_index, row in enumerate(layout):
@@ -124,7 +124,7 @@ class Level:
                 if value == '1':
                     hat_surface = pygame.image.load('graphics/character/player_end.png').convert_alpha()
                     StaticTile(goal_sprite, (tile_size, tile_size), x, y, hat_surface)
-                    Button(goal_button_sprite, x - 20, y - 20, self.display_surface, 'Enter')
+                    Button(goal_button_sprite, x - 25, y - 25, self.display_surface, 'Enter')
 
     def scroll_x(self):
         player = player_sprite.sprite

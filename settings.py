@@ -8,9 +8,10 @@ screen_height = 12*64
 screen_width = 20*64
 
 # text
-fps_font = pygame.font.SysFont('Hackbot Free Trial', 30)
-kills_font = pygame.font.SysFont('Hackbot Free Trial', 25)
-goal_font = pygame.font.SysFont('Hackbot Free Trial', 20)
+fps_font = pygame.font.Font('fonts/MinecraftRegular-Bmg3.ttf', 30)
+kills_font = pygame.font.Font('fonts/MinecraftRegular-Bmg3.ttf', 25)
+goal_font = pygame.font.Font('fonts/MinecraftRegular-Bmg3.ttf', 20)
+main_font = pygame.font.Font('fonts/MinecraftRegular-Bmg3.ttf', 35)
 
 # game variables
 gravity = 0.7
