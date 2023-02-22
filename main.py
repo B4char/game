@@ -5,28 +5,28 @@ from level import Level
 from game_data import level_list
 from fps import FPS
 from health_bar import HealthBar
-from support import clear_level
+from support import clear_level, play_music
 from transitions import Fade
 from menu import MainMenu
 
 pygame.init()
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('Game')
+pygame.mouse.set_visible(False)
 
 jump_event = False
 attack_event = False
 button_event = False
 num_level = 0
 
-can_play = True
-
-music_list = ['sounds/game_music.wav', 'sounds/menu_music.wav', 'sounds/tutorial_music.wav']
-pygame.mixer.music.set_volume(0.135)
+cursor_image = pygame.image.load('graphics/mouse/mouse_cursor.png').convert_alpha()
+music_list = ['sounds/menu_music.wav', 'sounds/game_music.wav', 'sounds/tutorial_music.wav']
 
 health_bar = HealthBar(screen)
 fps = FPS()
 fade = Fade()
 main_menu = MainMenu(screen)
+play_music(0, music_list)
 
 can_fade_out = False
 can_fade_in = False
@@ -36,34 +36,37 @@ playing_game = False
 create_level = True
 fade_timer = pygame.time.get_ticks()
 level = None
-checked = ''
+pressed = ''
 
 run = True
 while run:
     if in_main_menu:  # the player is in the main menu
-        check = main_menu.update(button_event)
-        if check == 'play' or checked == 'play':  # if the player pressed the play button
-            checked = 'play'
+        cursor_image.set_alpha(255)
+        check_button = main_menu.update(button_event)
+        if check_button == 'play' or pressed == 'play':  # if the player pressed the play button
+            pressed = 'play'
+            cursor_image.set_alpha(0)
             can_fade_out = True
             if pygame.time.get_ticks() - main_menu.fade_timer > 1000:
-                playing_game = True  # send to game
+                playing_game = True  # send to game (level 1)
                 num_level = 1
                 in_main_menu = False
                 can_fade_in = True
                 can_fade_out = False
-                can_play = True
-                pygame.mixer.music.fadeout(1000)
-        elif check == 'tutorial' or checked == 'tutorial':  # if the player pressed the tutorial button
-            checked = 'tutorial'
+                play_music(1, music_list)
+        elif check_button == 'tutorial' or pressed == 'tutorial':  # if the player pressed the tutorial button
+            pressed = 'tutorial'
+            cursor_image.set_alpha(0)
             can_fade_out = True
             if pygame.time.get_ticks() - main_menu.fade_timer > 1000:
+                cursor_image.set_alpha(0)
                 playing_tutorial = True  # send to tutorial
                 num_level = 0
                 in_main_menu = False
                 can_fade_in = True
                 can_fade_out = False
-                can_play = True
-                pygame.mixer.music.fadeout(1000)
+                play_music(2, music_list)
+                pressed = ''
 
         button_sprites.update(button_event)
         button_sprites.draw(screen)
@@ -71,6 +74,7 @@ while run:
     else:  # the player is either in the game or in the tutorial
         if playing_game:  # if the player is in the game
             if num_level == 1 and create_level:  # if the player came from the main menu
+                clear_level()
                 level = Level(level_list[num_level], screen, player_max_health, num_level)  # create level 1
                 create_level = False
             else:  # the player came from another level
@@ -86,13 +90,18 @@ while run:
                         can_fade_out = False
         elif playing_tutorial:  # the player is in the tutorial
             if create_level:
+                clear_level()
                 level = Level(level_list[num_level], screen, player_max_health, num_level)  # create tutorial
                 create_level = False
             if level.next_level:
-                num_level = 0
-                playing_tutorial = False
-                playing_game = True
-                create_level = False
+                can_fade_out = True
+                if pygame.time.get_ticks() - level.reset_timer > 1000:
+                    playing_tutorial = False
+                    in_main_menu = True
+                    create_level = True
+                    can_fade_in = True
+                    can_fade_out = False
+                    play_music(0, music_list)
 
         if level:
             level.run()
@@ -118,17 +127,6 @@ while run:
             fade.update()
             can_fade_in = False
 
-    if can_play:
-        if in_main_menu:
-            pygame.mixer.music.load(music_list[1])
-        else:
-            if playing_tutorial:
-                pygame.mixer.music.load(music_list[2])
-            else:
-                pygame.mixer.music.load(music_list[0])
-        pygame.mixer.music.play(-1)
-        can_play = False
-
     # event loop:
     for event in pygame.event.get():
         # quit game
@@ -151,6 +149,7 @@ while run:
             if event.button == pygame.BUTTON_LEFT:
                 button_event = False
 
+    screen.blit(cursor_image, pygame.mouse.get_pos())
     pygame.display.update()
     fps.clock.tick(60)
 

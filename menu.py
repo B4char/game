@@ -1,7 +1,9 @@
 import pygame
-from support import create_npc_animation_list
-from sprite_groups import button_sprites
+from decoration import Clouds
+from support import create_npc_animation_list, create_clouds
+from sprite_groups import button_sprites, cloud_sprites
 from buttons import MenuButton
+from random import randint
 
 
 class MainMenu(pygame.sprite.Sprite):
@@ -33,6 +35,8 @@ class MainMenu(pygame.sprite.Sprite):
         self.play_button = MenuButton(640 - 300 * 0.75 // 2, 200, button_sprites, 'play')
         self.tutorial_button = MenuButton(640 - 500 * 0.75 // 2, 325, button_sprites, 'tutorial')
 
+        create_clouds()
+
     def animate(self):
         animation_speed = 150
         self.player_img = self.animation_list[self.frame_index]
@@ -63,6 +67,8 @@ class MainMenu(pygame.sprite.Sprite):
     def update(self, pressed) -> str:
         self.scroll_x()
         self.screen.blit(self.sky, (0, 0))
+        cloud_sprites.update(-0.5)
+        cloud_sprites.draw(self.screen)
         self.screen.blit(self.mountain1, self.mountain_rect1.topleft)
         self.screen.blit(self.mountain2, self.mountain_rect2.topleft)
         self.screen.blit(self.grass1, self.grass_rect1.topleft)

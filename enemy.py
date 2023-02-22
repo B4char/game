@@ -196,7 +196,7 @@ class Enemy(pygame.sprite.Sprite):
             self.reverse()
 
     def random_idle(self):
-        if randint(1, 1200) == 1 and not self.idle:  # the enemy isn't idling rn
+        if randint(1, 800) == 1 and not self.idle:  # the enemy isn't idling rn
             # blue the enemy
             self.update_enemy_to_idle()
 

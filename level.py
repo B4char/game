@@ -1,5 +1,5 @@
 from random import randint
-from support import import_csv_layout, import_cut_graphics
+from support import import_csv_layout, import_cut_graphics, create_clouds
 from settings import tile_size, screen_width, permanent_speed, kills_font
 from sprite_groups import *
 from tiles import StaticTile, Tile
@@ -66,6 +66,7 @@ class Level:
             self.add_to_tile_group(npc_layout, 'npc')
 
         self.sky = Sky()
+        create_clouds()
         mountain_tile = pygame.image.load('graphics/decoration/sky/background_middle.png').convert_alpha()
         mountain_tile = pygame.transform.scale(mountain_tile, (1440, 900))
         for x in range(0, 2):
@@ -193,6 +194,10 @@ class Level:
 
         # sky
         self.sky.draw(self.display_surface)
+
+        cloud_sprites.update(self.world_shift_x * 0.125)
+        cloud_sprites.draw(self.display_surface)
+
         mountain_sprites.update(self.world_shift_x * 0.5)
         mountain_sprites.draw(self.display_surface)
 

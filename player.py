@@ -147,7 +147,7 @@ class Player(pygame.sprite.Sprite):
         self.action = 4
         self.attacking = True
         self.frame_index = 0
-        self.attack_cooldown = 90
+        self.attack_cooldown = 60
         # attack !
 
     def input(self):

@@ -1,5 +1,9 @@
 from csv import reader
+from random import randint
+
 import pygame.image
+
+from decoration import Clouds
 from settings import tile_size
 from os import listdir, walk
 from sprite_groups import *
@@ -95,7 +99,6 @@ def create_attack_particles(scale):
         animation_img = pygame.image.load(f'graphics/particles/attack_particles/{i}.png').convert_alpha()
         animation_img = pygame.transform.scale(animation_img, (int(animation_img.get_width() * scale),
                                                                int(animation_img.get_height() * scale)))
-
         particles_list.append(animation_img)
     return particles_list
 
@@ -115,6 +118,38 @@ def create_particles(scale):
     return particles_images
 
 
+def create_clouds():
+    count_clouds = 0
+    while count_clouds < 8:
+        pos_x = randint(50, 1300)
+        pos_y = randint(30, 400)
+        new_cloud = Clouds(pos_x, pos_y)
+        if cloud_sprites:
+            if new_cloud:
+                if not pygame.sprite.spritecollide(new_cloud, cloud_sprites, False):
+                    count_clouds += 1
+                    cloud_sprites.add(new_cloud)
+        else:
+            count_clouds += 1
+            cloud_sprites.add(new_cloud)
+
+
+def play_music(music, music_list):
+    if music == 0:
+        pygame.mixer.music.fadeout(1000)
+        pygame.mixer.music.load(music_list[0])
+        pygame.mixer.music.set_volume(0.135)
+    elif music == 1:
+        pygame.mixer.music.fadeout(1000)
+        pygame.mixer.music.load(music_list[1])
+        pygame.mixer.music.set_volume(0.135)
+    elif music == 2:
+        pygame.mixer.music.fadeout(1000)
+        pygame.mixer.music.load(music_list[2])
+        pygame.mixer.music.set_volume(0.135)
+    pygame.mixer.music.play(-1)
+
+
 def clear_level():
     enemy_sprites.empty()
     terrain_sprites.empty()
@@ -127,3 +162,4 @@ def clear_level():
     npc_button_sprite.empty()
     npc_sprite.empty()
     goal_button_sprite.empty()
+    cloud_sprites.empty()
