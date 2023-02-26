@@ -33,7 +33,7 @@ class MainMenu(pygame.sprite.Sprite):
         self.update_time = pygame.time.get_ticks()
 
         self.play_button = MenuButton(640 - 300 * 0.75 // 2, 200, button_sprites, 'play')
-        self.tutorial_button = MenuButton(640 - 500 * 0.75 // 2, 325, button_sprites, 'tutorial')
+        self.tutorial_button = MenuButton(640 - 420 * 0.75 // 2, 325, button_sprites, 'tutorial')
 
         create_clouds()
 
@@ -64,7 +64,7 @@ class MainMenu(pygame.sprite.Sprite):
         elif self.grass_rect3.right <= 0:
             self.grass_rect3.x = 1440
 
-    def update(self, pressed) -> str:
+    def update(self, pressed, in_transition) -> str:
         self.scroll_x()
         self.screen.blit(self.sky, (0, 0))
         cloud_sprites.update(-0.5)
@@ -76,9 +76,9 @@ class MainMenu(pygame.sprite.Sprite):
         self.screen.blit(self.grass3, self.grass_rect3.topleft)
         self.screen.blit(self.player_img, (640 - self.player_img.get_width() // 2, 600))
         self.animate()
-        if self.play_button.check_pressed(pressed) == 'play':
+        if self.play_button.check_pressed(pressed, in_transition) == 'play':
             self.fade_timer = pygame.time.get_ticks()
             return 'play'
-        elif self.tutorial_button.check_pressed(pressed) == 'tutorial':
+        elif self.tutorial_button.check_pressed(pressed, in_transition) == 'tutorial':
             self.fade_timer = pygame.time.get_ticks()
             return 'tutorial'

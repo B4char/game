@@ -23,8 +23,14 @@ class Level:
         self.back_to_lobby = False
         self.next_level = False
         self.updated = False
+        self.tutorial_updated = False
         self.reset_timer = pygame.time.get_ticks()
+        self.tutorial_timer = pygame.time.get_ticks()
         self.player_health = health
+        self.show_text = False
+        self.text_type = 'move'
+        self.tutorial_dialogue = ['move', 'attack', 'none']
+        self.counter = 0
 
         # terrain:
         terrain_layout = import_csv_layout(level_data['terrain'])
@@ -109,8 +115,8 @@ class Level:
 
                     if sprite_type == 'npc':
                         if value == '1':
-                            Npc(x, y, 2.3, 'blue', npc_sprite)
-                            Button(npc_button_sprite, x - 80, y - 35, self.display_surface, 'Let\'s Play')
+                            Npc(x, y, 2.3, 'blue', npc_sprite, self.display_surface)
+                            Button(npc_button_sprite, x - 77, y - 35, self.display_surface, 'How to play')
 
     def player_setup(self, layout):
         for row_index, row in enumerate(layout):
@@ -124,8 +130,17 @@ class Level:
                 # goal
                 if value == '1':
                     hat_surface = pygame.image.load('graphics/character/player_end.png').convert_alpha()
-                    StaticTile(goal_sprite, (tile_size, tile_size), x, y, hat_surface)
-                    Button(goal_button_sprite, x - 25, y - 25, self.display_surface, 'Enter')
+                    hat_surface = pygame.transform.scale(hat_surface, (int(hat_surface.get_width() * 1.1),
+                                                                       int(hat_surface.get_height() * 1.1)))
+                    if self.current_level == 0:
+                        text = 'Back to menu'
+                        offset_x = 54
+                        hat_surface = pygame.transform.flip(hat_surface, True, False)
+                    else:
+                        text = 'Next level'
+                        offset_x = 40
+                    StaticTile(goal_sprite, (tile_size, tile_size), x, y - 6, hat_surface)
+                    Button(goal_button_sprite, x - offset_x, y - 35, self.display_surface, text)
 
     def scroll_x(self):
         player = player_sprite.sprite
@@ -171,14 +186,13 @@ class Level:
                 self.draw_goal = False
 
     def check_npc_collision(self):
-        if pygame.Rect.colliderect(player_sprite.sprite.rect, npc_sprite.sprite.npc_rect):
+        if pygame.Rect.colliderect(player_sprite.sprite.rect, npc_sprite.sprite.npc_rect) and not self.tutorial_updated:
             self.draw_text = True
             keys = pygame.key.get_pressed()
             if keys[pygame.K_e]:
-                if not self.updated:
-                    self.reset_timer = pygame.time.get_ticks()
-                    self.next_level = True
-                    self.updated = True
+                if not self.tutorial_updated:
+                    self.tutorial_updated = True
+                    self.show_text = True
         else:
             self.draw_text = False
 
@@ -191,6 +205,9 @@ class Level:
 
         # text
         text, textRect = self.update_text()
+
+        if not self.tutorial_updated:
+            self.tutorial_timer = pygame.time.get_ticks()
 
         # sky
         self.sky.draw(self.display_surface)
@@ -214,8 +231,16 @@ class Level:
         # enemy_constraint_sprites.draw(self.display_surface)
 
         # NPCs
-        npc_sprite.update(self.world_shift_x)
+        if pygame.time.get_ticks() - self.tutorial_timer > 10000:
+            self.counter += 1
+            self.text_type = self.tutorial_dialogue[self.counter]
+            self.tutorial_timer = pygame.time.get_ticks()
+        npc_sprite.update(self.world_shift_x, self.show_text, self.tutorial_dialogue[self.counter])
         npc_sprite.draw(self.display_surface)
+        if self.counter == 2:
+            self.counter = 0
+            self.tutorial_updated = False
+            self.show_text = False
 
         # terrain
         terrain_sprites.update(self.world_shift_x)

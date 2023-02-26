@@ -29,10 +29,10 @@ class MenuButton(pygame.sprite.Sprite):
         self.y = self.rect.topleft[1]
         self.can_play = False
 
-    def check_pressed(self, pressed):
+    def check_pressed(self, pressed, in_transition):
         if self.x <= pygame.mouse.get_pos()[0] <= self.x + self.rect.width and\
                 self.y <= pygame.mouse.get_pos()[1] <= self.y + self.rect.height:
-            if self.can_play:
+            if self.can_play and not in_transition:
                 button_sound.play()
                 self.can_play = False
             self.image.set_alpha(235)

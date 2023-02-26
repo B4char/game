@@ -11,7 +11,7 @@ from menu import MainMenu
 
 pygame.init()
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption('Game')
+pygame.display.set_caption('Bubba\'s Adventures')
 pygame.mouse.set_visible(False)
 
 jump_event = False
@@ -42,7 +42,7 @@ run = True
 while run:
     if in_main_menu:  # the player is in the main menu
         cursor_image.set_alpha(255)
-        check_button = main_menu.update(button_event)
+        check_button = main_menu.update(button_event, not can_fade_in)
         if check_button == 'play' or pressed == 'play':  # if the player pressed the play button
             pressed = 'play'
             cursor_image.set_alpha(0)
@@ -59,7 +59,6 @@ while run:
             cursor_image.set_alpha(0)
             can_fade_out = True
             if pygame.time.get_ticks() - main_menu.fade_timer > 1000:
-                cursor_image.set_alpha(0)
                 playing_tutorial = True  # send to tutorial
                 num_level = 0
                 in_main_menu = False
@@ -136,7 +135,7 @@ while run:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 run = False
-            if event.key == pygame.K_SPACE:
+            if event.key == pygame.K_SPACE or event.key == pygame.K_w or event.key == pygame.K_UP:
                 jump_event = True
 
         if event.type == pygame.MOUSEBUTTONDOWN:

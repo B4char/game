@@ -21,6 +21,7 @@ stone_sprites = pygame.sprite.Group()
 tree_sprites = pygame.sprite.Group()
 mountain_sprites = pygame.sprite.Group()
 npc_sprite = pygame.sprite.GroupSingle()
+bubble_text_sprite = pygame.sprite.GroupSingle()
 
 # menu
 menu_sprites = pygame.sprite.GroupSingle()
