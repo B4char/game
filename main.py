@@ -8,6 +8,7 @@ from health_bar import HealthBar
 from support import clear_level, play_music
 from transitions import Fade
 from menu import MainMenu
+from timer import Timer
 
 pygame.init()
 screen = pygame.display.set_mode((screen_width, screen_height))
@@ -35,6 +36,7 @@ playing_tutorial = False
 playing_game = False
 create_level = True
 fade_timer = pygame.time.get_ticks()
+timer = None
 level = None
 pressed = ''
 
@@ -48,6 +50,7 @@ while run:
             cursor_image.set_alpha(0)
             can_fade_out = True
             if pygame.time.get_ticks() - main_menu.fade_timer > 1000:
+                timer = Timer()
                 playing_game = True  # send to game (level 1)
                 num_level = 1
                 in_main_menu = False
@@ -111,6 +114,12 @@ while run:
             health_bar.update()
             health_bar.draw_health_bar()
             health_bar.update_hp(player_sprite.sprite.health)
+
+    if timer is not None:
+        if num_level != 18:
+            timer.update()
+        else:
+            timer.draw(screen)
 
     fps.render(screen)
     jump_event = False

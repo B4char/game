@@ -1,10 +1,12 @@
 import pygame
 from random import randint
 from support import create_enemy_animation_list
-from sprite_groups import enemy_constraint_sprites, terrain_sprites, player_sprite
+from sprite_groups import enemy_borders_sprites, terrain_sprites, player_sprite
 from settings import gravity, enemy_max_health
 from particles import AttackParticles
 from sounds import hit_sound
+from health_orb import HealthOrb
+
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, group, x, y, scale, display_surface, color):
@@ -40,14 +42,29 @@ class Enemy(pygame.sprite.Sprite):
         self.idle = False  # is the enemy blue ? (yes/no)
 
         # attack
+        if color == 'red':
+            self.damage = 6
+            self.attack_cooldown = 1400
+        if color == 'green':
+            self.damage = 9
+            self.attack_cooldown = 1350
+        if color == 'black':
+            self.damage = 12
+            self.attack_cooldown = 1300
+        if color == 'white':
+            self.damage = 15
+            self.attack_cooldown = 1250
         self.on_player = False  # can the enemy see the player ? (yes/no)
         self.attacking = False  # if the enemy is currently attacking (mid attack animation)
         self.hit = False  # if the enemy has already hit the player in the current attack - True, else - False
         self.idle_attack = False  # is the enemy blue after the attack ? (yes/no)
 
         # health / status
+        self.health_img = pygame.image.load('graphics/healthbar/enemy_hp.png').convert_alpha()
+        self.health_bar_img = pygame.image.load('graphics/healthbar/enemy_health_bar.png').convert_alpha()
         self.is_alive = True  # is the player alive ? (yes/no)
         self.health = enemy_max_health  # enemy health
+        self.created_orb = False
 
         # timers
         self.animation_timer = pygame.time.get_ticks()  # animation timer
@@ -169,7 +186,7 @@ class Enemy(pygame.sprite.Sprite):
             self.is_alive = False
 
     def check_reverse_collision(self):
-        reverse_sprites = pygame.sprite.spritecollide(self, enemy_constraint_sprites, False)
+        reverse_sprites = pygame.sprite.spritecollide(self, enemy_borders_sprites, False)
         if reverse_sprites:
             for sprite in reverse_sprites:
                 if self.flip:
@@ -184,10 +201,10 @@ class Enemy(pygame.sprite.Sprite):
             self.check_reverse_collision()  # check for reverse collision
             self.random_reverse()
 
-            if pygame.time.get_ticks() - self.idle_timer > 5500:  # if the enemy was blue for the last 5.5 sec
+            if pygame.time.get_ticks() - self.idle_timer > 5500:  # if the enemy was idle for the last 5.5 sec
                 self.idle = False
 
-            if not self.idle:  # the player isn't blue
+            if not self.idle:  # enemy isn't idling
                 self.update_enemy_to_move()
                 self.random_idle()
 
@@ -256,9 +273,8 @@ class Enemy(pygame.sprite.Sprite):
             # check if the enemy hasn't already hit the player
             if not self.hit and pygame.time.get_ticks() - self.hit_timer > 200:
                 hit_sound.play()
-                player.health -= randint(4, 9)
+                player.health -= randint(self.damage - 3, self.damage)
                 self.hit = True
-                print(player.health)
 
     def update_enemy_to_death(self):
         self.speed = 0
@@ -283,7 +299,7 @@ class Enemy(pygame.sprite.Sprite):
         else:
             self.check_attack_collision()
 
-        if pygame.time.get_ticks() - self.idle_attack_timer > 1400:
+        if pygame.time.get_ticks() - self.idle_attack_timer > self.attack_cooldown:
             self.idle_attack = False
 
     def enable_hitbox(self):
@@ -298,8 +314,20 @@ class Enemy(pygame.sprite.Sprite):
         self.check_alive()
         self.update_rectangles()
 
-        # enemy movement:
+        # enemy movement:1
         if self.is_alive:  # the enemy is alive
+            if self.health < 100:
+                if not self.flip:
+                    offset = 0
+                else:
+                    offset = 2
+                self.health_img = pygame.transform.scale(self.health_img, (42 / 100 * self.health,
+                                                                           self.health_img.get_height()))
+                self.display_surface.blit(self.health_img, (self.rect.centerx - self.rect.width // 2 - offset,
+                                                            self.rect.top - 16))
+                self.display_surface.blit(self.health_bar_img, (self.rect.centerx - self.rect.width // 2 - offset - 3,
+                                                                self.rect.top - 19))
+                # show enemy hp
             self.update_timers()
             self.check_vision_collision()
             if player_sprite.sprite.is_alive:  # the player is alive
@@ -311,6 +339,10 @@ class Enemy(pygame.sprite.Sprite):
                 self.update_enemy_to_idle()
         else:  # the enemy is dead
             self.update_enemy_to_death()
+            if not self.created_orb:
+                if randint(1, 4) == 1:
+                    HealthOrb(self.pos)
+                self.created_orb = True
 
         self.move(shift_x)
 

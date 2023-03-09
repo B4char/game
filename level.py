@@ -47,15 +47,15 @@ class Level:
             player_layout = import_csv_layout(level_data['player'])
             self.player_setup(player_layout)
 
-        # constraint
+        # border
         # enemy:
-        if not level_data.get('enemy constraints') is None:
-            enemy_constraint_layout = import_csv_layout(level_data['enemy constraints'])
-            self.add_to_tile_group(enemy_constraint_layout, 'enemy constraints')
+        if not level_data.get('enemy borders') is None:
+            enemy_border_layout = import_csv_layout(level_data['enemy borders'])
+            self.add_to_tile_group(enemy_border_layout, 'enemy borders')
         # player:
-        if not level_data.get('player constraints') is None:
-            player_constraint_layout = import_csv_layout(level_data['player constraints'])
-            self.add_to_tile_group(player_constraint_layout, 'player constraints')
+        if not level_data.get('player borders') is None:
+            player_border_layout = import_csv_layout(level_data['player borders'])
+            self.add_to_tile_group(player_border_layout, 'player borders')
 
         # decoration
         # stones:
@@ -90,17 +90,24 @@ class Level:
                         StaticTile(terrain_sprites, (tile_size, tile_size), x, y, tile_surface)
 
                     if sprite_type == 'enemy':
-                        Enemy(enemy_sprites, x, y, 2.3, self.display_surface, 'white')
+                        if value == '0':
+                            Enemy(enemy_sprites, x, y, 2.3, self.display_surface, 'red')
+                        if value == '1':
+                            Enemy(enemy_sprites, x, y, 2.3, self.display_surface, 'green')
+                        if value == '2':
+                            Enemy(enemy_sprites, x, y, 2.3, self.display_surface, 'black')
+                        if value == '3':
+                            Enemy(enemy_sprites, x, y, 2.3, self.display_surface, 'white')
                         self.number_of_enemies += 1
 
-                    if sprite_type == 'enemy constraints':
-                        if value == '1':  # right
-                            Tile(enemy_constraint_sprites, (1, tile_size), x + 70, y)
-                        elif value == '2':  # left
-                            Tile(enemy_constraint_sprites, (1, tile_size), x - 6, y)
+                    if sprite_type == 'enemy borders':
+                        if value == '4':  # right
+                            Tile(enemy_borders_sprites, (1, tile_size), x + 70, y)
+                        elif value == '5':  # left
+                            Tile(enemy_borders_sprites, (1, tile_size), x - 6, y)
 
-                    if sprite_type == 'player constraints':
-                        Tile(player_constraint_sprites, (tile_size, tile_size), x, y)
+                    if sprite_type == 'player borders':
+                        Tile(player_borders_sprites, (tile_size, tile_size), x, y)
 
                     if sprite_type == 'stones':
                         tile_surface = self.terrain_tile_list[int(value)]
@@ -129,17 +136,17 @@ class Level:
                            [terrain_sprites], self.player_health)
                 # goal
                 if value == '1':
-                    hat_surface = pygame.image.load('graphics/character/player_end.png').convert_alpha()
-                    hat_surface = pygame.transform.scale(hat_surface, (int(hat_surface.get_width() * 1.1),
-                                                                       int(hat_surface.get_height() * 1.1)))
+                    goal_surface = pygame.image.load('graphics/character/player_end.png').convert_alpha()
+                    goal_surface = pygame.transform.scale(goal_surface, (int(goal_surface.get_width() * 1.18),
+                                                                         int(goal_surface.get_height() * 1.18)))
                     if self.current_level == 0:
                         text = 'Back to menu'
                         offset_x = 54
-                        hat_surface = pygame.transform.flip(hat_surface, True, False)
+                        goal_surface = pygame.transform.flip(goal_surface, True, False)
                     else:
                         text = 'Next level'
                         offset_x = 40
-                    StaticTile(goal_sprite, (tile_size, tile_size), x, y - 6, hat_surface)
+                    StaticTile(goal_sprite, (tile_size, tile_size), x, y - 11, goal_surface)
                     Button(goal_button_sprite, x - offset_x, y - 35, self.display_surface, text)
 
     def scroll_x(self):
@@ -147,11 +154,11 @@ class Level:
         player_x = player.rect.centerx
         direction_x = player.direction.x
         if player.is_alive:
-            if (screen_width // 2) > player_x > player_constraint_sprites.sprites()[0].rect.right + 9 * tile_size + 10\
+            if (screen_width // 2) > player_x > player_borders_sprites.sprites()[0].rect.right + 9 * tile_size + 10\
                     and direction_x < 0:
                 self.world_shift_x = permanent_speed
                 player.speed = 0
-            elif (screen_width // 2) < player_x < player_constraint_sprites.sprites()[1].rect.left - 9 * tile_size - 10\
+            elif (screen_width // 2) < player_x < player_borders_sprites.sprites()[1].rect.left - 9 * tile_size - 10\
                     and direction_x > 0:
                 self.world_shift_x = -permanent_speed
                 player.speed = 0
@@ -172,7 +179,7 @@ class Level:
         return text, textRect
 
     def check_goal_collision(self):
-        if self.number_of_enemies == 0:
+        if self.number_of_enemies == 0 or self.current_level == 0:
             if pygame.sprite.spritecollide(player_sprite.sprite, goal_sprite, False):
                 self.draw_goal = True
 
@@ -227,11 +234,11 @@ class Level:
         # enemies
         enemy_sprites.update(self.world_shift_x)
         enemy_sprites.draw(self.display_surface)
-        enemy_constraint_sprites.update(self.world_shift_x)
-        # enemy_constraint_sprites.draw(self.display_surface)
+        enemy_borders_sprites.update(self.world_shift_x)
+        # enemy_borders_sprites.draw(self.display_surface)
 
         # NPCs
-        if pygame.time.get_ticks() - self.tutorial_timer > 10000:
+        if pygame.time.get_ticks() - self.tutorial_timer > 6000:
             self.counter += 1
             self.text_type = self.tutorial_dialogue[self.counter]
             self.tutorial_timer = pygame.time.get_ticks()
@@ -246,10 +253,13 @@ class Level:
         terrain_sprites.update(self.world_shift_x)
         terrain_sprites.draw(self.display_surface)
 
+        health_orbs_sprites.update(self.world_shift_x, self.display_surface)
+        health_orbs_sprites.draw(self.display_surface)
+
         # player sprites
         goal_sprite.update(self.world_shift_x)
         goal_sprite.draw(self.display_surface)
-        player_constraint_sprites.update(self.world_shift_x)
+        player_borders_sprites.update(self.world_shift_x)
 
         self.display_surface.blit(text, textRect)
 

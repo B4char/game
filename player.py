@@ -38,7 +38,7 @@ class Player(pygame.sprite.Sprite):
         self.old_rect = self.rect.copy()
 
         # hitbox
-        self.attack_hitbox = pygame.rect.Rect(pos[0], pos[1], self.rect.width * 1.2, 55)
+        self.attack_hitbox = pygame.rect.Rect(pos[0], pos[1], self.rect.width * 1.35, 55)
         self.hit = False
         self.offset = False
 
@@ -273,6 +273,11 @@ class Player(pygame.sprite.Sprite):
                 self.pos.x -= 28
                 self.offset = True
 
+    def update_health(self, health):
+        self.health += health
+        if self.health > 100:
+            self.health = 100
+
     def update_rectangles(self):
         # update rectangles:
         self.old_rect = self.rect.copy()
@@ -282,11 +287,11 @@ class Player(pygame.sprite.Sprite):
                                       self.attack_hitbox.width, self.attack_hitbox.height)
         else:
             self.hitbox.update(self.pos.x + 8, self.pos.y, self.hitbox.width, self.hitbox.height)
-            self.attack_hitbox.update(round(self.pos.x) + 20, round(self.pos.y) + 10,
+            self.attack_hitbox.update(round(self.pos.x) + 15, round(self.pos.y) + 10,
                                       self.attack_hitbox.width, self.attack_hitbox.height)
 
     def update(self, jump_event, attack_event):
-        # pygame.draw.rect(self.surface_display, 'red', self.rect, 2)
+        # pygame.draw.rect(self.surface_display, 'red', self.attack_hitbox, 2)
         self.jump_event = jump_event
         self.check_alive()
 

@@ -13,6 +13,7 @@ kills_font = pygame.font.Font('fonts/MinecraftRegular-Bmg3.ttf', 25)
 goal_font = pygame.font.Font('fonts/MinecraftRegular-Bmg3.ttf', 20)
 main_font = pygame.font.Font('fonts/MinecraftRegular-Bmg3.ttf', 35)
 tutorial_font = pygame.font.Font('fonts/MinecraftRegular-Bmg3.ttf', 26)
+timer_font = pygame.font.Font('fonts/MinecraftRegular-Bmg3.ttf', 30)
 
 # game variables
 gravity = 0.7

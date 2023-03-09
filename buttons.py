@@ -6,7 +6,7 @@ from sounds import button_sound
 class Button(pygame.sprite.Sprite):
     def __init__(self, group, x, y, surface_display, text):
         super().__init__(group)
-        self.image = pygame.image.load('graphics/ui/e_button.png').convert_alpha()
+        self.image = pygame.image.load('graphics/buttons/e_button.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=(x, y))
         self.text = goal_font.render(text, True, 'white')
         self.text_rect = self.text.get_rect(topleft=(x + 40, y + 5))

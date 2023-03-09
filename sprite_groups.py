@@ -8,11 +8,12 @@ particles_sprite = pygame.sprite.Group()
 # player:
 player_sprite = pygame.sprite.GroupSingle()
 goal_sprite = pygame.sprite.GroupSingle()
-player_constraint_sprites = pygame.sprite.Group()
+player_borders_sprites = pygame.sprite.Group()
+health_orbs_sprites = pygame.sprite.Group()
 
 # enemy
 enemy_sprites = pygame.sprite.Group()
-enemy_constraint_sprites = pygame.sprite.Group()
+enemy_borders_sprites = pygame.sprite.Group()
 
 # level
 terrain_sprites = pygame.sprite.Group()

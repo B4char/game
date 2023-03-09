@@ -53,24 +53,37 @@ class Npc(pygame.sprite.Sprite):
 class TextBubble(pygame.sprite.Sprite):
     def __init__(self, x, y, screen):
         super().__init__(bubble_text_sprite)
+        self.x = x
+        self.y = y
         self.text = None
+        self.text1 = None
+        self.text2 = None
         self.image = pygame.image.load('graphics/npc/text_bubble1.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=(x, y))
         self.screen = screen
 
     def draw(self):
-        self.screen.blit(self.image, (425, 285))
-        self.screen.blit(self.text, (500, 305))
+        self.screen.blit(self.image, (self.x - 20, 285))
+        if self.text is None:
+            self.screen.blit(self.text1, (self.x + 55, 305))
+            self.screen.blit(self.text2, (self.x + 146, 360))
+        elif self.text1 is None or self.text2 is None:
+            self.screen.blit(self.text, (self.x + 55, 305))
 
     def update(self, shift_x, text_type):
         if text_type == 'move':
             self.image = pygame.image.load('graphics/npc/text_bubble1.png').convert_alpha()
-            text = 'To move press:'
+            self.text = None
+            text1 = 'To move press:'
+            text2 = 'or'
+            self.text1 = tutorial_font.render(str(text1), True, 'black')
+            self.text2 = tutorial_font.render(str(text2), True, 'black')
         elif text_type == 'attack':
+            self.text1 = None
+            self.text2 = None
             self.image = pygame.image.load('graphics/npc/text_bubble2.png').convert_alpha()
             text = 'To attack press:'
+            self.text = tutorial_font.render(str(text), True, 'black')
         else:
             self.image.set_alpha(0)
-            text = ''
-        self.text = tutorial_font.render(str(text), True, 'black')
         self.rect.x += shift_x

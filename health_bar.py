@@ -5,10 +5,10 @@ from settings import player_max_health, kills_font
 class HealthBar(pygame.sprite.Sprite):
     def __init__(self, surface):
         super().__init__()
-        self.image = pygame.image.load('graphics/ui/health_bar.png').convert_alpha()
+        self.image = pygame.image.load('graphics/healthbar/health_bar.png').convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.bottomleft = (10, 10)
-        self.hp_img = pygame.image.load('graphics/ui/hp.png').convert_alpha()
+        self.hp_img = pygame.image.load('graphics/healthbar/hp.png').convert_alpha()
         self.hp_img_rect = self.hp_img.get_rect()
         self.hp_img_rect.bottomleft = (90, 25)
         self.display_surface = surface
@@ -22,8 +22,11 @@ class HealthBar(pygame.sprite.Sprite):
         self.hp_img_rect = self.hp_img.get_rect()
         self.hp_img_rect.bottomleft = (90, 25)
         text = kills_font.render(str(health) + "/" + str(player_max_health), True, 'black')
-        if health < 100:
-            offset_x = 10
-        else:
+        if health == 100:
             offset_x = 0
+        else:
+            if health < 10:
+                offset_x = 18
+            else:
+                offset_x = 10
         self.display_surface.blit(text, (137 + offset_x, 22))
