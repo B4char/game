@@ -75,6 +75,9 @@ while run:
 
     else:  # the player is either in the game or in the tutorial
         if playing_game:  # if the player is in the game
+            if num_level == 18 and level.next_level:
+                run = False
+
             if num_level == 1 and create_level:  # if the player came from the main menu
                 clear_level()
                 level = Level(level_list[num_level], screen, player_max_health, num_level)  # create level 1

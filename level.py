@@ -143,6 +143,9 @@ class Level:
                         text = 'Back to menu'
                         offset_x = 54
                         goal_surface = pygame.transform.flip(goal_surface, True, False)
+                    elif self.current_level == 18:
+                        text = 'Exit game'
+                        offset_x = 37
                     else:
                         text = 'Next level'
                         offset_x = 40
